@@ -4,7 +4,8 @@ layout: ../../layouts/Docs.astro
 
 How keelstackhq works with coding agents, in eight principles, and which part of each one bosun
 checks today. The mapping follows bosun's operating model (`docs/operating-model.md` on bosun
-`main` at `ba4ed9c`, bosun 0.11.0, 2026-11-09); a principle that bosun does not check yet says so.
+`main` at `ba4ed9c`, bosun 0.11.0, 2026-11-09; bosun is at 0.15.0 now and this mapping was not re-synced, see
+bosun's changelog); a principle that bosun does not check yet says so.
 
 ## Words used here
 

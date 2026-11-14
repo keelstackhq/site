@@ -4,8 +4,21 @@ layout: ../../layouts/Docs.astro
 
 Agents write the code; the owner decides what is risky and approves the risky changes. bosun
 checks every pull request against risk rules, collects a review verdict from a fresh reviewer, and
-turns `risk-check` green only when the rules are met. This page follows bosun 0.4.0
-(2026-11-01).
+turns `risk-check` green only when the rules are met. The cheat sheet, signer and digest below
+follow bosun 0.15.0; the rule table and the older sections were last checked against bosun 0.4.0
+(2026-11-01), so read bosun's `docs/spec/08-risk.md` for anything newer.
+
+## Cheat sheet: who approves what
+
+| Case                          | What happens                                                                                                                                                                                                                                                                           |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Normal risk (no rule matches) | A normal-risk PR (no rule in .bosun/risk.toml matches) merges on green CI and a clean review verdict. No approval.                                                                                                                                                                     |
+| High risk (a rule matches)    | The owner approves the exact head of a high-risk PR: one that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets), and also R-ci, R-deps, R-prod-write and R-unseen. |
+
+How the owner approves:
+
+- Chat form: Claude asks in the Claude Code chat (repo, PR, head SHA; approve or hold) and posts the signed approval.
+- GitHub: comment `/bosun approve <40-character head SHA>` from the owner account; a new push needs a new comment.
 
 ## Risk rules
 
@@ -269,3 +282,24 @@ While an issue with that label, opened by an owner, is open, every command that 
 work exits 4. Close the issue to resume. An issue opened by anyone else is ignored. Agents must
 never close it, but bosun cannot enforce that yet; against a misbehaving agent also set the repo
 variable `BOSUN_HALT=1`, which agents cannot change.
+
+## Opt-in CI signer and Slack digest
+
+Both are off by default.
+
+**CI signer** (keyless fast lane for cloud and Claude Tag sessions, which hold no secrets). Four steps, once per repo:
+
+1. `bosun keygen --role signer --id signer-ci --out <pem outside the repo> --enroll`
+2. Merge that .bosun/approvers.toml PR (R-gov: the owner approves).
+3. Create the GitHub environment bosun-signer (deployment branches: the default branch only) with the secret BOSUN_SIGNER_KEY set to the PEM, then delete the PEM.
+4. Set `signer = true` under [approvals] in .bosun/bosun.toml (R-weaken: the owner approves). It needs [checks] mode = "checks" with the gate App and the autonomous policy.
+
+The signer key signs only the autonomous form, so a leaked key can sign at most what the fast lane already lets the orchestrator approve. Verdict session tags are self-declared, so independence rests on honest agents.
+
+**Slack digest.** The digest (`bosun digest`; one a day from steady up) lists the approvals waiting. `bosun notify` posts it only when `notify` in the `[slack]` table names it:
+
+```toml
+notify = ["owner-question", "main-red", "budget-halt", "halt", "thread-result", "digest"]
+```
+
+Slack never approves: the owner approves by chat form or on GitHub; Slack only carries the links.
