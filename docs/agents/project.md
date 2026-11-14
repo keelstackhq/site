@@ -278,8 +278,8 @@ freely, template updates never touch it.
   adopt and start-checklist re-copied, assess sha256 `2fb956cb…`; bosun `docs/setup-script.sh`
   re-copied at bosun `834c4c8`. Hero re-run at hull v0.10.0 (62 files: 37 owned, 8 shared, 17 seed;
   lines unchanged); greenfield re-checked with `bosun init` and `plan check` 0.15.0 (adds
-  `signer.yml`). risk, tasks, ci and the operating model are labelled with the bosun version they
-  were last checked against (0.4.0 and 0.11.0): not re-synced. docspack 0.1.18.
+  `signer.yml`). risk, tasks, ci and the operating model re-synced to bosun 0.15.0 (`834c4c8`),
+  linking spec sections instead of copying. docspack 0.1.18.
 
 ## Blocked
 
