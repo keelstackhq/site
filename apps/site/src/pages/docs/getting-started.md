@@ -50,7 +50,7 @@ git add -A && git commit -m "chore: initial commit from hull"
 
 hull v0.4.0 adds opt-in pieces: `circleci` (a CircleCI `ci-ok` next to the GitHub `ci.yml`),
 `circleci-only` (no `ci.yml`; see [CI and gates](/docs/ci/#circleci)) and `secrets` (a
-`secrets.toml` and a `deploy.yml` behind the `prod` environment; it decrypts through hoist 0.3.0's
+`secrets.toml` and a `deploy.yml` behind the `prod` environment; it decrypts through hoist's
 `keelstackhq/hoist/secrets` action; see
 [Releases and updates](/docs/releases/#secrets)). An existing repo switches to CircleCI only with
 `splice add circleci`, then `splice add circleci-only`.
@@ -190,7 +190,7 @@ Then, still as the owner:
   toolchain with cargo-nextest and cargo-deny (rust stacks), and the pinned splice, hoist, berth
   and bosun.
 - Create the Routines: janitor (every hour, Haiku) and curator (daily, Sonnet), plus notify
-  (every hour, Haiku) only with a `[slack]` table; without it bosun 0.4.0 has no notify Routine
+  (every hour, Haiku) only with a `[slack]` table; without it bosun has no notify Routine
   and `bosun doctor` reports Slack as skipped. `bosun doctor` prints their prompts.
 
 `bosun doctor` reports the setup checklist as ok or missing (`--remote` also runs

@@ -29,7 +29,7 @@ bosun adopt --owner <login>              # writes bosun's files; commits nothing
 bosun doctor
 ```
 
-Owner: run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself; then bosun keygen --enroll.
+Owner: run bosun keygen --enroll first (in the orchestrator's container) and commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.
 
 ## Use Claude
 

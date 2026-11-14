@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { expect, test } from "vite-plus/test";
 import { buildLlmsTxt } from "../lib/llms";
 import { pickPath } from "./content";
@@ -23,7 +23,7 @@ import {
   SLACK_TOML,
   scenarios,
 } from "./scenarios";
-import { versions } from "./versions";
+import { bare, versions } from "./versions";
 
 const read = (rel: string) => readFileSync(new URL(`../pages/${rel}`, import.meta.url), "utf8");
 const start = read("docs/start.md");
@@ -45,6 +45,38 @@ test("scenarios a to f, each with an anchor on /docs/start and a landing card", 
 test("every code block of /docs/start is at most 12 lines", () => {
   for (const block of start.split("```").filter((_, i) => i % 2 === 1)) {
     expect(block.trim().split("\n").length - 1).toBeLessThanOrEqual(12);
+  }
+});
+
+const section = (id: string): string => {
+  const from = start.indexOf(`<a id="${id}"></a>`);
+  const next = start.slice(from + 1).search(/<a id="/);
+  return next < 0 ? start.slice(from) : start.slice(from, from + 1 + next);
+};
+
+test("each /docs/start block sits in its own scenario section, whole and in order", () => {
+  const want: [string, string][] = [
+    ["a", newRepoBlock(versions)],
+    ["b", adoptHullBlock(versions, adoptSrc.assess.url, adoptSrc.assess.sha256)],
+    ["b", adoptBosunBlock(versions)],
+    [
+      "c",
+      MIGRATE_COMMANDS.split("\n")
+        .map((l) => l.split("   #")[0])
+        .join("\n"),
+    ],
+    ["e", cliBlock(versions)],
+    ["e", SETUP_SHORT],
+    ["e", SLACK_TOML],
+    ["e", SLACK_COMMANDS],
+  ];
+  for (const [id, block] of want) {
+    const body = section(id);
+    if (id === "c") {
+      for (const l of block.split("\n")) expect(body).toContain(l);
+    } else {
+      expect(body).toContain(block);
+    }
   }
 });
 
@@ -95,14 +127,10 @@ test("/docs/risk has the cheat sheet, the 4 signer steps and the digest", () => 
   expect(risk).toContain(OWNER_APPROVES);
   expect(risk).toContain(APPROVE_COMMENT.replace("<40-character head SHA>", ""));
   expect(SIGNER_STEPS).toHaveLength(4);
-  for (const [i, step] of SIGNER_STEPS.entries()) {
-    expect(risk).toContain(
-      `${i + 1}. ${step.startsWith("bosun ") ? `\`${step}\`` : step}`.replace(
-        /`signer = true`/,
-        "`signer = true`",
-      ),
-    );
-  }
+  const listed = SIGNER_STEPS.map(
+    (step, i) => `${i + 1}. ${step.startsWith("bosun ") ? `\`${step}\`` : step}`,
+  );
+  expect(risk).toContain(listed.join("\n"));
   expect(risk).toContain(SLACK_NOTIFY_DIGEST);
 });
 
@@ -114,7 +142,7 @@ test("llms.txt: one line per scenario and one version line", () => {
   );
 });
 
-test("no docs page that states a current version names an older hull or bosun", () => {
+test("no docs page that pins a version names an older hull, bosun or hoist", () => {
   const pages = [
     "start",
     "start-here",
@@ -126,20 +154,20 @@ test("no docs page that states a current version names an older hull or bosun", 
   ];
   for (const p of pages) {
     const text = read(`docs/${p}.md`);
-    for (const [, v] of text.matchAll(/\bhull (v\d+\.\d+\.\d+)\b(?! and later)/g)) {
-      // "hull v0.4.0 and later" style history is fine; a pin must be the current one.
-      if (
-        /--ref|render hull|rendered from hull|Latest releases/.test(
-          text.slice(text.indexOf(`hull ${v}`) - 40, text.indexOf(`hull ${v}`)) +
-            text.slice(text.indexOf(`hull ${v}`), text.indexOf(`hull ${v}`) + 20),
-        )
-      ) {
-        expect(v, p).toBe(versions.hull);
-      }
+    for (const m of text.matchAll(/--ref (v\d+\.\d+\.\d+)|render hull (v\d+\.\d+\.\d+)/g)) {
+      expect(m[1] ?? m[2], p).toBe(versions.hull);
     }
-    expect(text, p).not.toMatch(/--ref v0\.(?!10\.0)\d+\.\d+/);
-    expect(text, p).not.toMatch(/@keelstackhq\/bosun@0\.(?!15\.0)\d+\.\d+/);
-    expect(text, p).not.toMatch(/@keelstackhq\/hoist@0\.(?!4\.1)\d+\.\d+/);
+    for (const m of text.matchAll(/@keelstackhq\/bosun@(\d+\.\d+\.\d+)/g))
+      expect(m[1], p).toBe(bare(versions.bosun));
+    for (const m of text.matchAll(/@keelstackhq\/hoist@(\d+\.\d+\.\d+)/g))
+      expect(m[1], p).toBe(versions.hoist);
+    for (const m of text.matchAll(
+      /Latest releases as of [\d-]+: hull (v\d+\.\d+\.\d+), splice ([\d.]+), bosun ([\d.]+)/g,
+    )) {
+      expect([m[1], m[2], m[3]], p).toEqual([versions.hull, versions.splice, bare(versions.bosun)]);
+    }
   }
-  expect(readdirSync(new URL("../pages/docs/", import.meta.url)).length).toBeGreaterThan(10);
+  expect(read("docs/start.md")).toContain(
+    `hull ${versions.hull}, splice ${versions.splice}, bosun ${bare(versions.bosun)}`,
+  );
 });

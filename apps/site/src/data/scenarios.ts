@@ -77,12 +77,12 @@ export const MODE_LADDER: readonly (readonly [string, string, string])[] = [
   ],
   [
     "booster",
-    "Steady plus fast-lane approval, auto spawn, fixer sessions, budget asks, curator proposals.",
+    "Steady plus fast-lane approval (autonomous policy), auto spawn, fixer sessions, budget asks, curator proposals.",
     "3 a day or fewer",
   ],
   [
     "autonomous",
-    "Booster plus auto-merge of exact-inverse reverts; the digest is about the one daily touch.",
+    "Booster plus auto-merge of exact-inverse reverts (needs a clean verdict); owner-class PRs still need an approval; about one owner touch a day (the digest).",
     "1 a day or fewer",
   ],
 ];
@@ -90,7 +90,7 @@ export const MODE_LADDER: readonly (readonly [string, string, string])[] = [
 export const MIGRATE_NOTES = [
   "One rung per PR unless the owner passes --direct; the PR body records that choice. Never move lighter after a red week.",
   "Before the next rung (bosun metrics --days 7): steady needs red-CI under 30 % and 5 owner touches a day or fewer for two weeks; booster under 20 % and 3; autonomous under 15 % and 1.",
-  "Rollback: bosun migrate --to <lower mode> (tighter is not R-weaken, still R-gov), or delete the [mode] table to return to gatekeeper.",
+  "Rollback: going tighter is the same command (bosun migrate --to steady): no R-weaken, still R-gov. Deleting the [mode] table returns to gatekeeper.",
 ];
 
 export const SLACK_TOML = [
@@ -112,17 +112,17 @@ export const SLACK_NOTIFY_DIGEST =
 export const APPROVE_COMMENT = "/bosun approve <40-character head SHA>";
 
 export const SIGNER_STEPS = [
+  'Pin a release that reads the key, then set `signer = true` under [approvals] and [checks] mode = "checks" (with the gate App) in .bosun/bosun.toml, in an owner-approved PR (R-weaken). It needs the autonomous policy.',
   "bosun keygen --role signer --id signer-ci --out <pem outside the repo> --enroll",
   "Merge that .bosun/approvers.toml PR (R-gov: the owner approves).",
   "Create the GitHub environment bosun-signer (deployment branches: the default branch only) with the secret BOSUN_SIGNER_KEY set to the PEM, then delete the PEM.",
-  'Set `signer = true` under [approvals] in .bosun/bosun.toml (R-weaken: the owner approves). It needs [checks] mode = "checks" with the gate App and the autonomous policy.',
 ] as const;
 
 export const NO_APPROVAL =
   "A normal-risk PR (no rule in .bosun/risk.toml matches) merges on green CI and a clean review verdict. No approval.";
 
 export const OWNER_APPROVES =
-  "The owner approves the exact head of a high-risk PR: one that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets), and also R-ci, R-deps, R-prod-write and R-unseen.";
+  "The owner approves the exact head of a high-risk PR. That is any PR that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets). R-ci, R-deps, R-prod-write, R-unseen, R-bundle, R-plan and R-revert are owner-class by default too. Exceptions: R-ci-review takes two independent verdicts, a delegate-class rule can be decided by a delegate, and under the autonomous policy allowlisted paths take the fast lane.";
 
 export const APPROVE_HOW = [
   "Chat form: Claude asks in the Claude Code chat (repo, PR, head SHA; approve or hold) and posts the signed approval.",
@@ -163,7 +163,7 @@ export const adoptBosunBlock = (v: Versions): string =>
   ].join("\n");
 
 export const ADOPT_BOSUN_OWNER =
-  "Owner: run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself; then bosun keygen --enroll.";
+  "Owner: run bosun keygen --enroll first (in the orchestrator's container) and commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.";
 
 export const cliBlock = (v: Versions): string =>
   [

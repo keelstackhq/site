@@ -10,10 +10,10 @@ follow bosun 0.15.0; the rule table and the older sections were last checked aga
 
 ## Cheat sheet: who approves what
 
-| Case                          | What happens                                                                                                                                                                                                                                                                           |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Normal risk (no rule matches) | A normal-risk PR (no rule in .bosun/risk.toml matches) merges on green CI and a clean review verdict. No approval.                                                                                                                                                                     |
-| High risk (a rule matches)    | The owner approves the exact head of a high-risk PR: one that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets), and also R-ci, R-deps, R-prod-write and R-unseen. |
+| Case                          | What happens                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Normal risk (no rule matches) | A normal-risk PR (no rule in .bosun/risk.toml matches) merges on green CI and a clean review verdict. No approval.                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| High risk (a rule matches)    | The owner approves the exact head of a high-risk PR. That is any PR that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets). R-ci, R-deps, R-prod-write, R-unseen, R-bundle, R-plan and R-revert are owner-class by default too. Exceptions: R-ci-review takes two independent verdicts, a delegate-class rule can be decided by a delegate, and under the autonomous policy allowlisted paths take the fast lane. |
 
 How the owner approves:
 
@@ -289,12 +289,12 @@ Both are off by default.
 
 **CI signer** (keyless fast lane for cloud and Claude Tag sessions, which hold no secrets). Four steps, once per repo:
 
-1. `bosun keygen --role signer --id signer-ci --out <pem outside the repo> --enroll`
-2. Merge that .bosun/approvers.toml PR (R-gov: the owner approves).
-3. Create the GitHub environment bosun-signer (deployment branches: the default branch only) with the secret BOSUN_SIGNER_KEY set to the PEM, then delete the PEM.
-4. Set `signer = true` under [approvals] in .bosun/bosun.toml (R-weaken: the owner approves). It needs [checks] mode = "checks" with the gate App and the autonomous policy.
+1. Pin a release that reads the key, then set `signer = true` under [approvals] and [checks] mode = "checks" (with the gate App) in .bosun/bosun.toml, in an owner-approved PR (R-weaken). It needs the autonomous policy.
+2. `bosun keygen --role signer --id signer-ci --out <pem outside the repo> --enroll`
+3. Merge that .bosun/approvers.toml PR (R-gov: the owner approves).
+4. Create the GitHub environment bosun-signer (deployment branches: the default branch only) with the secret BOSUN_SIGNER_KEY set to the PEM, then delete the PEM.
 
-The signer key signs only the autonomous form, so a leaked key can sign at most what the fast lane already lets the orchestrator approve. Verdict session tags are self-declared, so independence rests on honest agents.
+The signer key verifies only the autonomous form, so a leaked key can sign at most what the fast lane already lets the orchestrator approve. Verdict session tags are self-declared, so independence rests on honest agents.
 
 **Slack digest.** The digest (`bosun digest`; one a day from steady up) lists the approvals waiting. `bosun notify` posts it only when `notify` in the `[slack]` table names it:
 

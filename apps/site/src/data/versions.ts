@@ -1,5 +1,5 @@
 // The one table of current tool versions. A bump is one edit here, then `node scripts/adopt.mjs`,
-// the hero re-run (terminal in content.ts) and the Markdown pages that tests/versions.test.ts names.
+// the hero re-run (terminal in content.ts) and the Markdown pages that data/scenarios.test.ts names.
 export const versions = {
   hull: "v0.10.0",
   splice: "0.4.0",

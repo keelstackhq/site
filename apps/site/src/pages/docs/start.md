@@ -4,7 +4,7 @@ layout: ../../layouts/Docs.astro
 
 Pick your scenario and paste its block. Each block is exact: commands are copied from the hull, splice
 and bosun docs, and versions are the current ones (hull v0.10.0, splice 0.4.0, bosun 0.15.0).
-Owner steps are marked **[phone]** or **[computer]**. Everything else an agent does.
+Steps for the owner start with "Owner". Everything else an agent does.
 
 Machine-readable: this page is https://keelstack.dev/docs/start.md.
 
@@ -54,7 +54,7 @@ bosun adopt --owner <login>              # writes bosun's files; commits nothing
 bosun doctor
 ```
 
-Owner: run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself; then bosun keygen --enroll.
+Owner: run bosun keygen --enroll first (in the orchestrator's container) and commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.
 Full guides: [Adopt an existing repo](/docs/adopt/), [the nine steps](#long-form) below.
 
 <a id="c"></a>
@@ -132,7 +132,7 @@ bosun spawn --slack-thread <ts> --slack-user <U...> --request -
 
 A normal-risk PR (no rule in .bosun/risk.toml matches) merges on green CI and a clean review verdict. No approval.
 
-The owner approves the exact head of a high-risk PR: one that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets), and also R-ci, R-deps, R-prod-write and R-unseen.
+The owner approves the exact head of a high-risk PR. That is any PR that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets). R-ci, R-deps, R-prod-write, R-unseen, R-bundle, R-plan and R-revert are owner-class by default too. Exceptions: R-ci-review takes two independent verdicts, a delegate-class rule can be decided by a delegate, and under the autonomous policy allowlisted paths take the fast lane.
 
 - Chat form: Claude asks in the Claude Code chat (repo, PR, head SHA; approve or hold) and posts the signed approval.
 - GitHub: comment /bosun approve <40-character head SHA> from the owner account; a new push needs a new comment.
