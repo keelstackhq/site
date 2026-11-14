@@ -292,7 +292,7 @@ freely, template updates never touch it.
   `TODO(owner)` is hull's marker (scripts emit the line, tests pin it); Archivo latin preloaded.
   The dry run's gaps are closed: `/migrate.md` (linked from llms.txt), `/migrate/` step 1 for web and
   Slack only, bosun pinned from `versions.ts`, Routines and D-017 explained, block A with
-  `gh repo create` and hoist install/apply. docspack 0.1.21.
+  `gh repo create` and hoist install/apply. docspack 0.1.22 (also "less strict" for "lighter mode" in risk, tasks, operating model; absolute links in `/migrate.md`).
 
 ## Blocked
 
