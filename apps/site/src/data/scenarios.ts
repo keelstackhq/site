@@ -164,6 +164,9 @@ export const adoptHullBlock = (v: Versions, assessUrl: string, sha: string): str
     `npx @keelstackhq/splice@${v.splice} adopt gh:keelstackhq/hull//<template> --ref ${v.hull} --piece <id>:<name> ... --dry-run --json`,
   ].join("\n");
 
+export const ADOPT_HULL_NOTE =
+  "Read the change list, then run the same splice command without --dry-run. Never pass --force unless the owner names the files it may replace. Open the PR; the owner merges it. After the merge, for a Rust or ts-pnpm stack run bosun init --stack rust|ts-pnpm --plan plans/<name>.md --owner <login> (plan as in A; bosun adopt below is for repos without hull) and the hoist steps of A (hoist apply sets the ci-ok ruleset).";
+
 export const adoptBosunBlock: string = [
   "bosun adopt --dry-run                    # writes nothing",
   "bosun adopt --owner <login>              # writes bosun's files; commits nothing",

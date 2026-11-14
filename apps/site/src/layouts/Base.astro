@@ -42,10 +42,13 @@ const url = canonical ? canonicalUrl(Astro.url.pathname) : undefined;
     <a class="skip" href="#main">Skip to content</a>
     <slot />
     <script is:inline>
-      // Scrollable code blocks must be reachable by keyboard.
-      document.querySelectorAll("pre").forEach((p) => {
-        if (p.scrollWidth > p.clientWidth) p.tabIndex = 0;
-      });
+      // Scrollable code blocks must be reachable by keyboard, also after a resize.
+      const fit = () =>
+        document.querySelectorAll("pre").forEach((p) => {
+          p.tabIndex = p.scrollWidth > p.clientWidth ? 0 : -1;
+        });
+      fit();
+      addEventListener("resize", fit);
     </script>
   </body>
 </html>

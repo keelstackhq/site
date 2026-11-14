@@ -156,7 +156,7 @@ export const update: {
     heading: "Update bosun",
     steps: [
       { cmd: "bosun doctor", note: 'step 17 "update" gives the fix; warns, never fails' },
-      { cmd: "bosun pin --latest --check", note: "list only, writes nothing" },
+      { cmd: "bosun pin --latest --check", note: "default branch, clean tree; writes nothing" },
       {
         cmd: "bosun pin --latest --pr",
         note: "verifies npm sha512, branch bosun/pin, draft PR (default branch, clean tree)",

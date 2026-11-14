@@ -27,7 +27,7 @@ Work on a branch, so the update is one reviewable change:
 ## Update bosun
 
 1. `bosun doctor` # step 17 "update" gives the fix; warns, never fails
-2. `bosun pin --latest --check` # list only, writes nothing
+2. `bosun pin --latest --check` # default branch, clean tree; writes nothing
 3. `bosun pin --latest --pr` # verifies npm sha512, branch bosun/pin, draft PR (default branch, clean tree)
 4. The owner approves; auto-merge lands it on green.
 5. `npm i -g @keelstackhq/bosun@<new> && bosun --version` # your machine, after the merge; <new> is the version pin --check printed

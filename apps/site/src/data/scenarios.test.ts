@@ -4,6 +4,7 @@ import { buildLlmsTxt } from "../lib/llms";
 import { pickPath } from "./content";
 import {
   ADOPT_BOSUN_OWNER,
+  ADOPT_HULL_NOTE,
   adoptBosunBlock,
   adoptHullBlock,
   installBlock,
@@ -187,6 +188,12 @@ test("the bosun install line is on /docs/start once, in the setup block", () => 
   expect(start).toContain(installBlock(versions));
   expect(start.split(`npm i -g @keelstackhq/bosun@${bare(versions.bosun)}`)).toHaveLength(2);
   expect(start.split("export GITHUB_TOKEN=$(gh auth token)").length).toBeLessThanOrEqual(3);
+});
+
+test("/docs/adopt carries the same B notes as /docs/start", () => {
+  const adoptPage = read("docs/adopt.md");
+  expect(adoptPage).toContain(ADOPT_HULL_NOTE);
+  expect(adoptPage).toContain(ADOPT_BOSUN_OWNER);
 });
 
 test("block A commits the render before it pushes (splice new only runs git init)", () => {
