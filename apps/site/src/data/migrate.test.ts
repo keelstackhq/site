@@ -79,3 +79,13 @@ test("copy never names a client org or repo", () => {
   expect(orgs.length).toBeGreaterThan(0);
   expect(new Set(orgs)).toEqual(new Set(["keelstackhq"]));
 });
+
+test("migrate.md: every keelstack.dev URL has one origin and ends in .md or is the page itself", async () => {
+  const { GET } = await import("../pages/migrate.md");
+  const md = await GET().text();
+  expect(md).not.toMatch(/https:\/\/[^\s]*https:\/\//);
+  const own = [...md.matchAll(/https:\/\/keelstack\.dev\/[^\s)]*/g)].map((m) => m[0]);
+  expect(own).toContain("https://keelstack.dev/docs/start/e.md");
+  expect(own).toContain("https://keelstack.dev/docs/start/c.md");
+  for (const u of own) expect(u).toMatch(/\.md$/);
+});

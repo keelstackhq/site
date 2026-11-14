@@ -50,6 +50,9 @@ export const GET = () => {
     "",
   ]
     .join("\n")
-    .replace(/\/docs\/([a-z-]+)\//g, (_m, slug: string) => `${SITE_URL}${docMdPath(slug)}`);
+    .replace(
+      /(?<![\w:./])\/docs\/([a-z-]+)\//g,
+      (_m, slug: string) => `${SITE_URL}${docMdPath(slug)}`,
+    );
   return new Response(md, { headers: { "Content-Type": "text/markdown; charset=utf-8" } });
 };
