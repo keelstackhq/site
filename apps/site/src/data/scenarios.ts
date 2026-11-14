@@ -47,9 +47,6 @@ export const SETUP_SHORT = [
   "done; exit 0",
 ].join("\n");
 
-/** Extra hosts a Rust repo's docs/setup-script.sh downloads its prebuilt cargo tools from. */
-export const EXTRA_HOSTS = ["github.com", "release-assets.githubusercontent.com"] as const;
-
 export const NETWORK =
   "Network access: Limited, with Allow package managers ticked. Add only the hosts your repo's docs/setup-script.sh downloads from: a Rust repo needs github.com and release-assets.githubusercontent.com (prebuilt cargo tools); a repo that only uses npm needs none. No secrets in environment variables and no PAT: GitHub comes from the Claude GitHub App.";
 
@@ -126,8 +123,8 @@ export const OWNER_APPROVES =
   "The owner approves the exact head of a high-risk PR. That is any PR that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets). R-ci, R-deps, R-prod-write, R-unseen, R-bundle, R-plan and R-revert are owner-class by default too. Exceptions: R-ci-review takes two independent verdicts, a delegate-class rule can be decided by a delegate, and under the autonomous policy allowlisted paths take the fast lane.";
 
 export const APPROVE_HOW = [
-  "Chat form: Claude asks in the Claude Code chat (repo, PR, head SHA; approve or hold) and posts the signed approval.",
-  `GitHub: comment ${APPROVE_COMMENT} from the owner account; a new push needs a new comment.`,
+  "Chat form: the owner tells the signing session (repo, PR, head SHA; approve or hold) and it posts the signed approval below.",
+  `GitHub: the owner types ${APPROVE_COMMENT} in the GitHub web or mobile app, or posts it from their own machine with their own token; a new push needs a new comment. A plain comment posted from a Claude cloud session never counts. A review approves only if the owner did not open the PR, and agent PRs are opened under the owner's login.`,
 ] as const;
 
 // --- Scenario blocks (versions come from data/versions.ts) ---
@@ -143,6 +140,7 @@ export const newRepoBlock = (v: Versions): string =>
   [
     `pnpm dlx @keelstackhq/splice@${v.splice} new gh:keelstackhq/hull//template my-repo --ref ${v.hull} --piece preact-app:web --piece hono-worker:api`,
     "cd my-repo && pnpm install && pnpm run ci",
+    'git add -A && git commit -m "chore: render from hull"   # splice new only runs git init',
     "gh repo create <owner>/my-repo --private --source . --push   # owner step, before bosun init",
     "bosun init --stack ts-pnpm --plan plans/<name>.md --owner <login>   # opens the setup PR",
     "bosun doctor",
@@ -166,9 +164,6 @@ export const adoptHullBlock = (v: Versions, assessUrl: string, sha: string): str
     `npx @keelstackhq/splice@${v.splice} adopt gh:keelstackhq/hull//<template> --ref ${v.hull} --piece <id>:<name> ... --dry-run --json`,
   ].join("\n");
 
-export const ADOPT_HULL_NOTE =
-  "Read the change list, then run the same splice command without --dry-run on a new branch with a clean tree. Never pass --force unless the owner names the files it may replace.";
-
 export const adoptBosunBlock: string = [
   "bosun adopt --dry-run                    # writes nothing",
   "bosun adopt --owner <login>              # writes bosun's files; commits nothing",
@@ -176,6 +171,31 @@ export const adoptBosunBlock: string = [
 ].join("\n");
 
 export const ADOPT_BOSUN_OWNER =
-  "Owner: run bosun keygen --enroll first (in the orchestrator's container) and commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.";
+  "Owner: before the setup PR, the session that will sign approvals runs bosun keygen --enroll (in its own container or machine: the private key never leaves it) and you commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.";
+
+export const upgradeBlock = (v: Versions): string =>
+  [
+    "bosun pin --latest --check            # default branch, clean tree; writes nothing",
+    "bosun pin --latest --pr               # verifies npm sha512, opens a draft PR; the owner approves",
+    "# after it merges, on your machine (<new> = the version pin --check printed):",
+    "npm i -g @keelstackhq/bosun@<new> && bosun --version",
+    "# then hull, on its own branch:",
+    "git switch <default-branch> && git pull && git switch -c chore/splice-update",
+    `pnpm dlx @keelstackhq/splice@${v.splice} update --all`,
+    `pnpm dlx @keelstackhq/splice@${v.splice} check && pnpm install && pnpm run ci`,
+    'git add -A && git commit -m "chore: splice update to hull vX.Y.Z" && git push -u origin HEAD',
+  ].join("\n");
+
+export const UPGRADE_NOTE =
+  "Do bosun first, then hull; each is its own PR and each is R-gov (.bosun/**, .claude/**, .splice/**), so the owner approves each head as in F. A repo with .splice/channels/bosun.toml skips bosun pin: splice update --all moves bosun's pin. Cloud sessions need nothing: they run the repo's own setup script. Merge only when ci-ok is green.";
+
+export const approveBlock: string = [
+  "bosun approve --list                                          # ready PRs and heads; writes nothing",
+  "bosun approve <pr>@<40-character head SHA> --sign-key <pem> --print   # shows the signed comment",
+  "bosun approve <pr>@<40-character head SHA> --sign-key <pem>           # posts it",
+].join("\n");
+
+export const SIGNED_PREREQ =
+  "Signed form (works from a cloud session): bosun 0.2.1 or later in .bosun/version, the signer's key enrolled in .bosun/approvers.toml on the default branch (bosun keygen --enroll, merged first through a PR the owner approves with a GitHub review or a plain comment), and the PEM held by the signing session.";
 
 export const cliBlock = "bosun doctor   # each missing step with its fix";

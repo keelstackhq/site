@@ -41,5 +41,11 @@ const url = canonical ? canonicalUrl(Astro.url.pathname) : undefined;
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <slot />
+    <script is:inline>
+      // Scrollable code blocks must be reachable by keyboard.
+      document.querySelectorAll("pre").forEach((p) => {
+        if (p.scrollWidth > p.clientWidth) p.tabIndex = 0;
+      });
+    </script>
   </body>
 </html>

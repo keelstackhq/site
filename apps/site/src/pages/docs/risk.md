@@ -17,8 +17,8 @@ Long details live in bosun's
 
 How the owner approves:
 
-- Chat form: Claude asks in the Claude Code chat (repo, PR, head SHA; approve or hold) and posts the signed approval.
-- GitHub: comment `/bosun approve <40-character head SHA>` from the owner account; a new push needs a new comment.
+- Chat form: the owner tells the signing session (repo, PR, head SHA; approve or hold) and it posts the signed approval ([how](#signed-approvals-from-chat)).
+- GitHub: the owner types `/bosun approve <40-character head SHA>` in the GitHub web or mobile app, or posts it from their own machine with their own token; a new push needs a new comment. A plain comment posted from a Claude cloud session never counts. A review approves only if the owner did not open the PR, and agent PRs are opened under the owner's login.
 
 ## Risk rules
 
