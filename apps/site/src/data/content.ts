@@ -156,7 +156,10 @@ export const update: {
     heading: "Update bosun",
     steps: [
       { cmd: "bosun doctor", note: 'step 17 "update" gives the fix; warns, never fails' },
-      { cmd: "bosun pin --latest --check", note: "default branch, clean tree; writes nothing" },
+      {
+        cmd: "bosun pin --latest --check",
+        note: "lists tools behind, downloads and writes nothing; run on the default branch",
+      },
       {
         cmd: "bosun pin --latest --pr",
         note: "verifies npm sha512, branch bosun/pin, draft PR (default branch, clean tree)",
@@ -169,7 +172,7 @@ export const update: {
     ],
     notes: [
       "Cloud: nothing to do. Paste `bosun setup-snippet` once; never again.",
-      "A repo with `.splice/channels/bosun.toml` skips `bosun pin`: `splice update --all` or `--channel bosun` moves it.",
+      "A repo with `.splice/channels/bosun.toml`: `bosun pin` refuses; use `splice update --channel bosun`.",
     ],
     guide: "https://github.com/keelstackhq/bosun/blob/main/docs/update.md",
   },

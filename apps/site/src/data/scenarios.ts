@@ -124,7 +124,7 @@ export const OWNER_APPROVES =
 
 export const APPROVE_HOW = [
   "Chat form: the owner tells the signing session (repo, PR, head SHA; approve or hold) and it posts the signed approval below.",
-  `GitHub: the owner types ${APPROVE_COMMENT} in the GitHub web or mobile app, or posts it from their own machine with their own token; a new push needs a new comment. A plain comment posted from a Claude cloud session never counts. A review approves only if the owner did not open the PR, and agent PRs are opened under the owner's login.`,
+  `GitHub: a plain ${APPROVE_COMMENT} comment counts only when posted with a plain user token (typed in the GitHub web or mobile app, or from the owner's own machine); comments posted by the Claude app or a cloud session never count. A new push needs a new comment. Agent PRs are opened under the owner's login and GitHub forbids self-review, so the owner uses a plain comment, a signed approval, or merges.`,
 ] as const;
 
 // --- Scenario blocks (versions come from data/versions.ts) ---
@@ -178,7 +178,7 @@ export const ADOPT_BOSUN_OWNER =
 
 export const upgradeBlock = (v: Versions): string =>
   [
-    "bosun pin --latest --check            # default branch, clean tree; writes nothing",
+    "bosun pin --latest --check            # lists tools behind, downloads and writes nothing; run on the default branch",
     "bosun pin --latest --pr               # verifies npm sha512, opens a draft PR; the owner approves",
     "# after it merges, on your machine (<new> = the version pin --check printed):",
     "npm i -g @keelstackhq/bosun@<new> && bosun --version",
@@ -190,7 +190,7 @@ export const upgradeBlock = (v: Versions): string =>
   ].join("\n");
 
 export const UPGRADE_NOTE =
-  "Do bosun first, then hull; each is its own PR and each is R-gov (.bosun/**, .claude/**, .splice/**), so the owner approves each head as in F. A repo with .splice/channels/bosun.toml skips bosun pin: splice update --all moves bosun's pin. Cloud sessions need nothing: they run the repo's own setup script. Merge only when ci-ok is green.";
+  "Do bosun first, then hull; each is its own PR and each is R-gov (.bosun/**, .claude/**, .splice/**), so the owner approves each head as in F. A repo with .splice/channels/bosun.toml cannot run bosun pin (it refuses): use splice update --channel bosun. Cloud sessions need nothing: they run the repo's own setup script. Merge only when ci-ok is green.";
 
 export const approveBlock: string = [
   "bosun approve --list                                          # ready PRs and heads; writes nothing",
@@ -199,6 +199,6 @@ export const approveBlock: string = [
 ].join("\n");
 
 export const SIGNED_PREREQ =
-  "Signed form (works from a cloud session): bosun 0.2.1 or later in .bosun/version, the signer's key enrolled in .bosun/approvers.toml on the default branch (bosun keygen --enroll, merged first through a PR the owner approves with a GitHub review or a plain comment), and the PEM held by the signing session.";
+  "Signed form (works from a cloud session): a bosun release with signed approvals (0.2.1 or later) in .bosun/version, the signer's key enrolled in .bosun/approvers.toml on the default branch (bosun keygen --enroll; the enrolling PR is R-gov, so the owner approves it with a GitHub review or a plain comment, since no signed approval counts on that PR), and the PEM held by the signing session.";
 
 export const cliBlock = "bosun doctor   # each missing step with its fix";

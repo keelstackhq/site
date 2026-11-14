@@ -27,13 +27,13 @@ Work on a branch, so the update is one reviewable change:
 ## Update bosun
 
 1. `bosun doctor` # step 17 "update" gives the fix; warns, never fails
-2. `bosun pin --latest --check` # default branch, clean tree; writes nothing
+2. `bosun pin --latest --check` # lists tools behind, downloads and writes nothing; run on the default branch
 3. `bosun pin --latest --pr` # verifies npm sha512, branch bosun/pin, draft PR (default branch, clean tree)
 4. The owner approves; auto-merge lands it on green.
 5. `npm i -g @keelstackhq/bosun@<new> && bosun --version` # your machine, after the merge; <new> is the version pin --check printed
 
 - Cloud: nothing to do. Paste `bosun setup-snippet` once; never again.
-- A repo with `.splice/channels/bosun.toml` skips `bosun pin`: `splice update --all` or `--channel bosun` moves it.
+- A repo with `.splice/channels/bosun.toml`: `bosun pin` refuses; use `splice update --channel bosun`.
 - Full guide: [bosun's `docs/update.md`](https://github.com/keelstackhq/bosun/blob/main/docs/update.md).
 
 Machine-readable: this page is https://keelstack.dev/docs/update.md.

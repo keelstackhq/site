@@ -104,7 +104,7 @@ Needs a repo that already runs bosun 0.15.0 or later. Use `--direct` only when t
 Needs [Setup](#setup).
 
 ```bash
-bosun pin --latest --check            # default branch, clean tree; writes nothing
+bosun pin --latest --check            # lists tools behind, downloads and writes nothing; run on the default branch
 bosun pin --latest --pr               # verifies npm sha512, opens a draft PR; the owner approves
 # after it merges, on your machine (<new> = the version pin --check printed):
 npm i -g @keelstackhq/bosun@<new> && bosun --version
@@ -115,7 +115,7 @@ pnpm dlx @keelstackhq/splice@0.4.0 check && pnpm install && pnpm run ci
 git add -A && git commit -m "chore: splice update to hull vX.Y.Z" && git push -u origin HEAD
 ```
 
-Do bosun first, then hull; each is its own PR and each is R-gov (.bosun/**, .claude/**, .splice/**), so the owner approves each head as in F. A repo with .splice/channels/bosun.toml skips bosun pin: splice update --all moves bosun's pin. Cloud sessions need nothing: they run the repo's own setup script. Merge only when ci-ok is green. Both paths in full: [Update](/docs/update/).
+Do bosun first, then hull; each is its own PR and each is R-gov (.bosun/**, .claude/**, .splice/**), so the owner approves each head as in F. A repo with .splice/channels/bosun.toml cannot run bosun pin (it refuses): use splice update --channel bosun. Cloud sessions need nothing: they run the repo's own setup script. Merge only when ci-ok is green. Both paths in full: [Update](/docs/update/).
 
 <a id="e"></a>
 
@@ -138,9 +138,9 @@ for d in . ./*/; do
 done; exit 0
 ```
 
-Network access: Limited, with Allow package managers ticked. Add only the hosts your repo's docs/setup-script.sh downloads from: a Rust repo needs github.com and release-assets.githubusercontent.com (prebuilt cargo tools); a repo that only uses npm needs none. No secrets in environment variables and no PAT: GitHub comes from the Claude GitHub App. A failed repo script only warns in the session's setup log: if a tool is missing, read the log and add the host. Children inherit the orchestrator's environment; for Slack, where there is no orchestrator, an R-gov PR sets `[cloud] environment_id = "env_..."` in `.bosun/bosun.toml` (the id is on the environment's settings). Owner: also create the Routines `bosun doctor` lists; doctor cannot see them. Details: [Cloud environment](/docs/cloud/).
+Network access: Limited, with Allow package managers ticked. Add only the hosts your repo's docs/setup-script.sh downloads from: a Rust repo needs github.com and release-assets.githubusercontent.com (prebuilt cargo tools); a repo that only uses npm needs none. No secrets in environment variables and no PAT: GitHub comes from the Claude GitHub App. A failed repo script only warns in the session's setup log: if a tool is missing, read the log and add the host. Children inherit the caller's environment; an R-gov PR can set `[cloud] environment_id = "env_..."` in `.bosun/bosun.toml` for spawns by relay or wave (the id is on the environment's settings). Owner: also create the Routines `bosun doctor` lists; doctor cannot see them. Details: [Cloud environment](/docs/cloud/).
 
-**Claude Tag in Slack.** Needs the web setup above first (its environment and `[cloud]` table), Claude Tag installed in your Slack workspace and invited to a private channel with no guests that is not shared. Once, an R-gov PR (a CLI or web session opens it; the owner approves it as in [F](#f)): your Slack member ID next to your login in `governance/owners.toml` (`slack = "U..."` on your `[[owner]]` entry), and in `.bosun/bosun.toml` this `[slack]` table plus the `[cloud]` table from the web setup. `channel` is the channel ID (channel details, at the bottom); `spawners = "owners"` lets only owners with a Slack ID start work; `may_spawn = true` allows `bosun spawn` from a thread, under the same checks and budget as any spawn. The owner also creates the hourly notify Routine. Fields, stdin and the notify and ack flow: [bosun's Slack spec](https://github.com/keelstackhq/bosun/blob/834c4c83762a5b42fff05d7964092a43b1729ac3/docs/spec/10-slack.md).
+**Claude Tag in Slack.** Needs Claude Tag installed in your Slack workspace and invited to a private channel with no guests that is not shared. Claude Tag runs each thread on the environment chosen for that channel in Claude Tag settings: use the one from the web setup above. Once, an R-gov PR (a CLI or web session opens it; the owner approves it as in [F](#f)): your Slack member ID in `governance/owners.toml` (the `slack` field of your owner entry, see the spec), and in `.bosun/bosun.toml` this `[slack]` table, plus the `[cloud]` table from the web setup if relay or wave spawns should use that environment. `channel` is the channel ID (channel details, at the bottom); `spawners = "owners"` lets only owners with a Slack ID start work; `may_spawn = true` allows `bosun spawn` from a thread, under the same checks and budget as any spawn. The owner also creates the hourly notify Routine. Fields, stdin and the notify and ack flow: [bosun's Slack spec](https://github.com/keelstackhq/bosun/blob/834c4c83762a5b42fff05d7964092a43b1729ac3/docs/spec/10-slack.md).
 
 ```toml
 [slack]
@@ -149,7 +149,7 @@ spawners = "owners"
 may_spawn = true
 ```
 
-In the channel the Claude Tag session labels itself and spawns work. `<ts>` and `<U...>` are the thread's timestamp and the poster's Slack user ID; `--request -` and `--channel-info -` read from stdin (the owner's message; the channel's JSON). `bosun notify` lists due posts in `next` as `slack_post`; the session posts them and then runs `bosun notify --ack <key>`. Slack never approves: approve on GitHub as in [F](#f).
+In the channel the Claude Tag session labels itself and spawns work. `<ts>` and `<U...>` are the thread's timestamp and the poster's Slack user ID; `--channel-info -` (on `bosun notify`) reads the channel's JSON from stdin; `--request -` (on `bosun spawn`) reads the owner's message. `bosun notify` lists due posts in `next` as `slack_post`; the session posts them and then runs `bosun notify --ack <key>`. Slack never approves: approve on GitHub as in [F](#f).
 
 ```bash
 bosun join --origin slack --slack-channel C0123456789 [--slack-thread <ts>]
@@ -166,9 +166,9 @@ A normal-risk PR (no rule in .bosun/risk.toml matches) merges on green CI and a 
 The owner approves the exact head of a high-risk PR. That is any PR that touches governance paths (R-gov: .bosun/**, governance/**, .claude/**, .splice/**, docs/setup-script.sh, ...), loosens a gate (R-weaken) or adds a secret (R-secrets). R-ci, R-deps, R-prod-write, R-unseen, R-bundle, R-plan and R-revert are owner-class by default too. Exceptions: R-ci-review takes two independent verdicts, a delegate-class rule can be decided by a delegate, and under the autonomous policy allowlisted paths take the fast lane.
 
 - Chat form: the owner tells the signing session (repo, PR, head SHA; approve or hold) and it posts the signed approval below.
-- GitHub: the owner types /bosun approve <40-character head SHA> in the GitHub web or mobile app, or posts it from their own machine with their own token; a new push needs a new comment. A plain comment posted from a Claude cloud session never counts. A review approves only if the owner did not open the PR, and agent PRs are opened under the owner's login.
+- GitHub: a plain /bosun approve <40-character head SHA> comment counts only when posted with a plain user token (typed in the GitHub web or mobile app, or from the owner's own machine); comments posted by the Claude app or a cloud session never count. A new push needs a new comment. Agent PRs are opened under the owner's login and GitHub forbids self-review, so the owner uses a plain comment, a signed approval, or merges.
 
-Signed form (works from a cloud session): bosun 0.2.1 or later in .bosun/version, the signer's key enrolled in .bosun/approvers.toml on the default branch (bosun keygen --enroll, merged first through a PR the owner approves with a GitHub review or a plain comment), and the PEM held by the signing session.
+Signed form (works from a cloud session): a bosun release with signed approvals (0.2.1 or later) in .bosun/version, the signer's key enrolled in .bosun/approvers.toml on the default branch (bosun keygen --enroll; the enrolling PR is R-gov, so the owner approves it with a GitHub review or a plain comment, since no signed approval counts on that PR), and the PEM held by the signing session.
 
 ```bash
 bosun approve --list                                          # ready PRs and heads; writes nothing
@@ -176,7 +176,7 @@ bosun approve <pr>@<40-character head SHA> --sign-key <pem> --print   # shows th
 bosun approve <pr>@<40-character head SHA> --sign-key <pem>           # posts it
 ```
 
-A review that requests changes withdraws every approval; after it is settled comment `/bosun recheck` or re-run the `risk` workflow. Slack never approves.
+A review that requests changes (or was dismissed) withdraws comment, signed and delegate approvals; a later approving review ends that state. After it is settled, comment `/bosun recheck` or re-run the `risk` workflow. Slack never approves.
 
 Opt-in CI signer (keyless fast lane) and Slack digest: [Risk and approvals](/docs/risk/#opt-in-ci-signer-and-slack-digest).
 
