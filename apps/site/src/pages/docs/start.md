@@ -32,16 +32,24 @@ Needs git, Node, and `gh auth login` done once (token scopes: repo, workflow). R
 
 Needs [Setup](#setup).
 
-Write `plans/<name>.md` from the owner's brief first (`bosun plan check` it); `bosun init` needs it. Use `//template-rust` and `--stack rust` for a Rust repo; piece ids and `my-repo` are your choices.
+After `splice new`, write `plans/<name>.md` in the new repo from the owner's brief (`bosun plan check` it): `bosun init` needs it. Use `//template-rust` and `--stack rust` for a Rust repo; piece ids and `my-repo` are your choices.
 
 ```bash
 pnpm dlx @keelstackhq/splice@0.4.0 new gh:keelstackhq/hull//template my-repo --ref v0.10.0 --piece preact-app:web --piece hono-worker:api
 cd my-repo && pnpm install && pnpm run ci
+gh repo create <owner>/my-repo --private --source . --push   # owner step, before bosun init
 bosun init --stack ts-pnpm --plan plans/<name>.md --owner <login>   # opens the setup PR
 bosun doctor
 ```
 
-Owner: create and push the GitHub repo before bosun init (Start a project, item 1); approve the setup PR's head and merge it; then run hoist apply.
+Owner: create and push the GitHub repo before bosun init (Start a project, item 1); approve the setup PR's head and merge it; then, on your machine in a checkout of the default branch:
+
+```bash
+npm install -g @keelstackhq/hoist@0.4.1
+hoist plan --area github          # what would change; writes nothing
+hoist apply --area github --yes   # write it, then verify like `hoist check`
+```
+
 Agents in the cloud: [E](#e). Full path: [Start here](/docs/start-here/), [Start a project](/docs/start-project/), [Greenfield repo with bosun](/docs/greenfield-bosun/).
 
 <a id="b"></a>
