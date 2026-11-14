@@ -68,7 +68,7 @@ bosun doctor
 ```
 
 Owner: run bosun keygen --enroll first (in the orchestrator's container) and commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.
-Then, in the setup PR's repo settings: install the [Claude GitHub App](https://github.com/apps/claude), protect the default branch with the required checks `ci-ok` (`bosun-ok` if a `ci-ok` job exists; adopt prints which), `risk-check`, `review-verdict` and `main-open`, and turn on Allow auto-merge. Run `bosun doctor` until only `plan` is left, then write `plans/<project>.md` and run `bosun plan check`. Cloud setup script: [E](#e).
+Then, in the setup PR's repo settings: install the [Claude GitHub App](https://github.com/apps/claude), protect the default branch with the required checks `ci-ok` (`bosun-ok` if a `ci-ok` job exists; adopt prints which), `risk-check`, `review-verdict` and `main-open`, and turn on Allow auto-merge. Run `bosun doctor` until only `plan` is left, then write `plans/<project>.md` and run `bosun plan check`. Cloud setup script: [E](#e). adopt never overwrites existing files; merge the setup PR yourself, since bosun's checks cannot run on it before its workflows are on the default branch; `plugins` may stay missing on a computer in doctor.
 Full guide: [Adopt an existing repo](/docs/adopt/).
 
 <a id="c"></a>
