@@ -40,9 +40,9 @@ test("leads with a pointer to the one setup script, then the 2-line prompt, then
   expect(order).toEqual(order.toSorted((a, b) => a - b));
 });
 
-test("requires bosun 0.15.0 and says it pairs with hull v0.11.0", () => {
+test("requires bosun 0.15.0 and says it pairs with hull v0.10.0", () => {
   expect(migrate.forWho).toContain(`bosun ${bare(versions.bosun)}`);
-  expect(migrate.forWho).toContain(`pairs with hull ${versions.hull}`);
+  expect(migrate.forWho).toContain("pairs with hull v0.10.0");
   expect(migrate.forWho).not.toMatch(/hull v0\.10\.0 or newer/);
   expect(JSON.stringify(migrate)).not.toContain("0.14.0");
 });
