@@ -34,7 +34,7 @@ freely, template updates never touch it.
     diverges from the template on purpose; keep that change when `splice update` ships.
   - Design spec: `docs/superpowers/specs/2026-10-16-landing-redesign-design.md` (supersedes
     `2026-10-16-landing-page-design.md`).
-  - Update bot: `.github/workflows/splice.yml` (`keelstackhq/splice/action@v1`, `scope: all`,
+  - Update bot: `.github/workflows/splice.yml` (`keelstackhq/splice/action@85c95b63f53836301f2405368767c6ae9138109f # v0.5.0`, `scope: all`,
     Mondays 06:17 UTC and by hand) runs `splice update --all`. With no main `.splice/lock.toml`
     that covers only the decisions channel (D-004); hull updates need a main lock first.
 
