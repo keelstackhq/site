@@ -113,8 +113,13 @@ describe("cloud environment page", () => {
     );
   });
 
-  it("pins the bosun release the site shows", () => {
-    expect(copy).toContain(`BOSUN_VERSION=${bosunVersion}\n`);
+  it("pins a bosun release no newer than the one the site shows", () => {
+    // bosun's own repo pins the release before its newest tag (v0.16.0 pins 0.15.0).
+    const pinned = /^BOSUN_VERSION=(\d+)\.(\d+)\.(\d+)$/m.exec(copy)?.slice(1).map(Number) ?? [];
+    const shown = (bosunVersion ?? "").split(".").map(Number);
+    expect(pinned).toHaveLength(3);
+    expect(pinned[1]).toBeLessThanOrEqual(shown[1] ?? -1);
+    expect(pinned[1]).toBeGreaterThanOrEqual((shown[1] ?? 0) - 1);
   });
 });
 

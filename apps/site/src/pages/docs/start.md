@@ -3,7 +3,7 @@ layout: ../../layouts/Docs.astro
 ---
 
 Pick your scenario and paste its block. Each block is exact: commands are copied from the hull, splice
-and bosun docs, and versions are the current ones (hull v0.12.0, splice 0.5.1, bosun 0.15.0).
+and bosun docs, and versions are the current ones (hull v0.12.0, splice 0.5.1, bosun 0.16.0).
 Steps for the owner start with "Owner". Everything else an agent does.
 
 Machine-readable: this page is https://keelstack.dev/docs/start.md.
@@ -13,7 +13,7 @@ Machine-readable: this page is https://keelstack.dev/docs/start.md.
 Once on your machine (every block below assumes it):
 
 ```bash
-npm i -g @keelstackhq/bosun@0.15.0
+npm i -g @keelstackhq/bosun@0.16.0
 export GITHUB_TOKEN=$(gh auth token)   # in your shell, never in a file
 ```
 
@@ -115,7 +115,7 @@ pnpm dlx @keelstackhq/splice@0.5.1 check && pnpm install && pnpm run ci
 git add -A && git commit -m "chore: splice update to hull vX.Y.Z" && git push -u origin HEAD
 ```
 
-Do bosun first, then hull; each is its own PR and each is R-gov (.bosun/**, .claude/**, .splice/**), so the owner approves each head as in F. A repo set up with bosun init or hull has .splice/channels/bosun.toml and cannot run bosun pin (it refuses, exit 1): there splice update --all below also updates the bosun channel (or splice update --channel bosun alone), so skip the bosun pin lines and the npm line; install the bosun version the merged channel update put in .bosun/version. The bosun pin lines are for a repo set up with bosun adopt. Cloud sessions run the repo's own setup script, whose tool pins come with the bosun release: bosun 0.15.0's script pins splice 0.4.0, hoist 0.4.1 and berth 0.1.0, so a cloud session runs those until a later bosun release moves them. Merge only when ci-ok is green. Both paths in full: [Update](/docs/update/).
+Do bosun first, then hull; each is its own PR and each is R-gov (.bosun/**, .claude/**, .splice/**), so the owner approves each head as in F. A repo set up with bosun init or hull has .splice/channels/bosun.toml and cannot run bosun pin (it refuses, exit 1): there splice update --all below also updates the bosun channel (or splice update --channel bosun alone), so skip the bosun pin lines and the npm line; install the bosun version the merged channel update put in .bosun/version. The bosun pin lines are for a repo set up with bosun adopt. Cloud sessions run the repo's own setup script, whose tool pins come with the bosun release: bosun 0.16.0's script pins splice 0.5.1, hoist 0.5.1 and berth 0.2.1, so a cloud session runs those until a later bosun release moves them. Merge only when ci-ok is green. Both paths in full: [Update](/docs/update/).
 
 <a id="e"></a>
 
