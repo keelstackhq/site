@@ -178,3 +178,9 @@ describe("Greenfield repo with bosun page", () => {
       expect(page).toContain(s);
   });
 });
+
+it("no page uses the stale splice/action@v1 tag", () => {
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".md"))) {
+    expect(readFileSync(new URL(f, dir), "utf8"), f).not.toContain("splice/action@v1");
+  }
+});

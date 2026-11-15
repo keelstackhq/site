@@ -236,3 +236,10 @@ head; environments, tags, releases, decisions merges, branch rules and secrets s
 owner (release-environment taps on the phone).
 
 Check: the owner's answer to `approvals`; `bootstrap` fails after 2026-11-30 UTC.
+
+---
+
+Note on this copy (not part of hull's file): it is pinned to hull v0.11.0. Its janitor routine is
+optional since bosun 0.16 and hull `main`: set `[routines] janitor = true` only if you want it. Where
+it names a bosun version (such as "bosun 0.4.0"), use the bosun version in the versions table
+(`apps/site/src/data/versions.ts`, the footer's verified line) instead.

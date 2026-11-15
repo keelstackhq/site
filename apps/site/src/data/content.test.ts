@@ -67,9 +67,10 @@ test("agent rows and current cards", () => {
   expect(current.map((c) => !!c.accent)).toEqual([false, false, true]);
 });
 
-test("CLAUDE.md row: subagents come from the rigging channel since hull v0.2.0", () => {
+test("CLAUDE.md row: hull ships the subagents, no rigging step since hull v0.11.0", () => {
   const row = agentRows.find((r) => r.key === "CLAUDE.md");
-  expect(row?.text).toContain("rigging channel");
+  expect(row?.text).toContain("hull ships the subagents");
+  expect(row?.text).not.toContain("rigging");
   expect(row?.text).not.toMatch(/Subagents, skills/);
 });
 

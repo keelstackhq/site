@@ -44,6 +44,15 @@ const tagged = execFileSync(
   },
 ).trim();
 const since = tagged ? `hull ${sinceTag}` : `hull ${sinceTag} (not tagged yet)`;
+const NOTE = `
+
+---
+
+Note on this copy (not part of hull's file): it is pinned to hull v0.11.0. Its janitor routine is
+optional since bosun 0.16 and hull \`main\`: set \`[routines] janitor = true\` only if you want it. Where
+it names a bosun version (such as "bosun 0.4.0"), use the bosun version in the versions table
+(\`apps/site/src/data/versions.ts\`, the footer's verified line) instead.
+`;
 const page = `---
 layout: ../../layouts/Docs.astro
 ---
@@ -59,6 +68,6 @@ repo was rendered from. The full path, with the details, is in
 
 \`TODO(owner)\` in the copy is hull's own marker for facts hull's maintainers have not written down. It is not a step for you: skip it.
 
-${copy.replace(/^# .*\n\n/, "")}`;
+${copy.replace(/^# .*\n\n/, "")}${NOTE}`;
 writeFileSync(new URL("../src/pages/docs/start-project.md", import.meta.url), page);
 console.log(`start-checklist: ${repo}@${commit} sha256 ${sha256}`);

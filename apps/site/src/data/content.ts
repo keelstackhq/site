@@ -67,7 +67,7 @@ export const split = {
 export const agentRows: { key: string; text: string; href?: string }[] = [
   {
     key: "CLAUDE.md",
-    text: "Lean by default. Skills and a /loop default ship with the template; subagents come from hull’s rigging channel.",
+    text: "Lean by default. Skills and a /loop default ship with the template; hull ships the subagents too.",
   },
   {
     key: "ready",
