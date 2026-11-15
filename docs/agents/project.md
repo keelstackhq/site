@@ -320,6 +320,12 @@ freely, template updates never touch it.
   dropped). Hero re-run with splice 0.5.0 (0.5.1 not on npm yet): 67 files, 41/8/18, lines unchanged.
   docspack 0.1.26.
 - 2026-11-15 Docs index: the tools table's Released column was left on hull v0.11.0, splice 0.5.0, hoist 0.5.0, berth 0.2.0; now v0.12.0, 0.5.1, 0.5.1, 0.2.1, and `tools.test.ts` pins every cell to `versions.ts` so it cannot drift.
+- 2026-11-15 Design polish (layout and UX only, no facts or versions changed): home Pick your path in
+  1/2/3 columns with arrows, stat strip in 1/2/4 columns, sticky For agents panel, Get started links as a
+  list, hero terminal wraps with a hanging indent; docs get an "On this page" rail (1200 px and up) or
+  disclosure, the Start scenario list shows as lettered A to F cards, the 404 lists popular pages; the
+  verified line is an `aside` landmark; `--flag` no longer renders as an en dash (satteri processor,
+  dashes off) and R-gov globs no longer render bold. docspack 0.1.27.
 
 ## Blocked
 
