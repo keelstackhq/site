@@ -33,7 +33,7 @@ test("terminal shows the default command, real create lines and file counts", ()
     `gh:keelstackhq/hull//template my-repo --ref ${versions.hull} \\`,
     "--piece preact-app:web --piece hono-worker:api",
   ]);
-  // Lines copied from `splice new` output (hull v0.10.0, splice 0.4.0), in output order.
+  // Lines copied from `splice new` output (hull v0.11.0, splice 0.4.0), in output order.
   expect(terminal.output.map((o) => `create  ${o.path}  ${o.cls}`)).toEqual([
     "create  .github/workflows/ci.yml  owned",
     "create  AGENTS.md  seed",
@@ -41,7 +41,7 @@ test("terminal shows the default command, real create lines and file counts", ()
     "create  apps/api/src/index.ts  seed",
     "create  apps/web/src/app.tsx  seed",
   ]);
-  expect(terminal.summary).toBe("# … 62 files: 37 owned, 8 shared, 17 seed; then pnpm install");
+  expect(terminal.summary).toBe("# … 67 files: 41 owned, 8 shared, 18 seed; then pnpm install");
 });
 
 test("stats shapes", () => {

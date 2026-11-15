@@ -34,7 +34,16 @@ writeFileSync(
 
 const isCommit = /^[0-9a-f]{40}$/.test(ref);
 const label = isCommit ? `commit \`${commit.slice(0, 7)}\`` : `\`${ref}\``;
-const since = isCommit ? "hull v0.5.0 (not tagged yet)" : "hull v0.5.0";
+// "(not tagged yet)" only while hull has no v0.5.0 tag: ask the remote, never assume.
+const sinceTag = "v0.5.0";
+const tagged = execFileSync(
+  "git",
+  ["ls-remote", "--tags", `https://github.com/${repo}`, sinceTag],
+  {
+    encoding: "utf8",
+  },
+).trim();
+const since = tagged ? `hull ${sinceTag}` : `hull ${sinceTag} (not tagged yet)`;
 const page = `---
 layout: ../../layouts/Docs.astro
 ---
