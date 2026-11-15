@@ -47,10 +47,10 @@ KEELSTACK_MARKETPLACE_REF=main
 SUPERPOWERS_SHA=22f0b463e7a5e579904dd6211a520321035526f7
 CAVEMAN_SHA=a9cc1f7b82598852e8c6b8e599dde6ac2491b26e
 # The bosun release this repo pins in .bosun/version.
-BOSUN_VERSION=0.15.0
-BOSUN_SHA512=C3ZV006QyHgVTsfJu1BqHOOV8PeWEDJ5acQ+jAP+Aufe3aYGEjG8FWWqU0Sw86NzGy6u+wu+BJeX0LlXou71tQ==
-BOSUN_LINUX_X64_SHA512=a521uLd2ZM47QxTOelYfCxUhFh8PhvX3RkZcYc9jes9SXlCPGVFAk4g/SCxNzK8FRUmpecuPompEvoW34bnM/g==
-BOSUN_LINUX_ARM64_SHA512=rFZxI5scPYMZc6vJlJz/tyCCrTtVhSvhYFsNqZZP8ZVMP+jAU4UeOZPirBzF6RjqdsWrURg+vnw9uiSP2YL4Wg==
+BOSUN_VERSION=0.16.0
+BOSUN_SHA512=QNrK8kal+XvG0W0uDpvTyQwCC5CwL690GmlGFmcpK+Wofhgs/e3PetMXHv7EJ2WWPP3zdtjysTuAjbxsKr9/Lg==
+BOSUN_LINUX_X64_SHA512=BpfJOieNjWiQb0FtwvE8OINyeQU6c9o0z0H5lPTZ1wMrsZzV8eIYZjz7Hu06hsNKRxzfLQzEZGIl3A7j/VDuIQ==
+BOSUN_LINUX_ARM64_SHA512=VRsJ51XHS9P0UhBdI8DYE+6igZff5slHeZhLzplSSQSEm1rmZQ2cqPXFP08jMfaRGHGAUYiQTJz0S0YGoEJQgA==
 
 # Stacks of this checkout: Rust steps run only with a Cargo.toml or a toolchain file, pnpm only
 # with a pnpm-lock.yaml, a pnpm-workspace.yaml or a package.json `packageManager` of pnpm.
@@ -251,6 +251,22 @@ if [ -n "$HAS_RUST" ]; then
 fi
 
 bosun --version || echo "setup-script: bosun is not installed" >&2
+# The installed bosun must be the pinned one: an older bosun earlier on PATH shadows the install.
+# Mismatch: put the npm-global bin first on PATH for this script and warn loudly. Never fails.
+got="$(bosun --version 2>/dev/null | awk '{print $NF}')"
+if [ "$got" != "$BOSUN_VERSION" ]; then
+  gbin="$(npm prefix -g 2>/dev/null)/bin"
+  if [ -x "$gbin/bosun" ]; then
+    PATH="$gbin:$PATH"
+    export PATH
+    got="$(bosun --version 2>/dev/null | awk '{print $NF}')"
+  fi
+  if [ "$got" != "$BOSUN_VERSION" ]; then
+    echo "setup-script: WARNING: bosun on PATH is '${got:-none}', not the pinned $BOSUN_VERSION; add $gbin to the front of PATH" >&2
+  else
+    echo "setup-script: WARNING: an older bosun shadowed the pinned $BOSUN_VERSION; put $gbin first on PATH in your shell" >&2
+  fi
+fi
 
 # Prewarm the Claude Code plugins (user scope) so the first session does not clone them. Every
 # failure, an outage or a pin mismatch, only warns (owner decision): `bosun doctor` shows it red.

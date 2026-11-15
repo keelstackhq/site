@@ -1,4 +1,4 @@
-// Move a repo to bosun booster: copy from bosun docs/migrate-booster.md (bosun main at 2b8aaab),
+// Move a repo to bosun booster: copy from bosun docs/migrate-booster.md (bosun main at 5865515),
 // Quick start at its top. Needs bosun 0.16.0 (pairs with hull v0.10.0, per the bosun changelog); versions come from versions.ts. Names no client org or repo.
 
 import { MIGRATE_NOTES, MIGRATE_PROMPT, MODE_LADDER } from "./scenarios";

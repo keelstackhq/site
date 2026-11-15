@@ -320,7 +320,7 @@ freely, template updates never touch it.
   dropped). Hero re-run with splice 0.5.0 (0.5.1 not on npm yet): 67 files, 41/8/18, lines unchanged.
   docspack 0.1.26.
 - 2026-11-15 Docs index: the tools table's Released column was left on hull v0.11.0, splice 0.5.0, hoist 0.5.0, berth 0.2.0; now v0.12.0, 0.5.1, 0.5.1, 0.2.1, and `tools.test.ts` pins every cell to `versions.ts` so it cannot drift.
-- 2026-11-15 bosun 0.16.0 (`2b8aaab`): `versions.ts`, Start/Getting started pins, docs index and the Cloud page; `data/bosun/setup-script.sh` re-copied at the tag (pins splice 0.5.1, hoist 0.5.1, berth 0.2.1; bosun's own repo pins bosun 0.15.0, so the test allows one minor behind). The janitor is opt-in in 0.16.0 (already worded so). Pages that say "follows bosun 0.15.0" (risk, tasks, ci, operating model, greenfield) were not re-synced. docspack 0.1.27.
+- 2026-11-15 bosun 0.16.0 (`2b8aaab`): `versions.ts`, Start/Getting started pins, docs index and the Cloud page; `data/bosun/setup-script.sh` re-copied at the tag (pins splice 0.5.1, hoist 0.5.1, berth 0.2.1; bosun's own repo pins bosun 0.15.0, so the test allows one minor behind). The janitor is opt-in in 0.16.0 (already worded so). Re-synced to bosun `5865515` (the post-release pin, `.bosun/version` and the setup script pin 0.16.0): the script is re-copied from it (installs bosun 0.16.0; the pin test is exact again); risk, tasks, ci, operating model and greenfield follow bosun 0.16.0 (janitor opt-in, one-off cap and `pr --one-off`, plan ticks, wider R-secrets/R-ci/R-gov/R-deps/R-unseen, no `bosun:allow-secret`, `autonomous_allow`); greenfield tree and `plan check` re-run on 0.16.0, unchanged. docspack 0.1.27.
 
 ## Blocked
 

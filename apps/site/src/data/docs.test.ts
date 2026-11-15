@@ -113,13 +113,8 @@ describe("cloud environment page", () => {
     );
   });
 
-  it("pins a bosun release no newer than the one the site shows", () => {
-    // bosun's own repo pins the release before its newest tag (v0.16.0 pins 0.15.0).
-    const pinned = /^BOSUN_VERSION=(\d+)\.(\d+)\.(\d+)$/m.exec(copy)?.slice(1).map(Number) ?? [];
-    const shown = (bosunVersion ?? "").split(".").map(Number);
-    expect(pinned).toHaveLength(3);
-    expect(pinned[1]).toBeLessThanOrEqual(shown[1] ?? -1);
-    expect(pinned[1]).toBeGreaterThanOrEqual((shown[1] ?? 0) - 1);
+  it("pins the bosun release the site shows", () => {
+    expect(/^BOSUN_VERSION=(\S+)$/m.exec(copy)?.[1]).toBe(bosunVersion);
   });
 });
 
@@ -148,14 +143,14 @@ describe("sources after the 2026-10-28 refresh", () => {
 
 describe("Greenfield repo with bosun page", () => {
   const page = readFileSync(new URL("../pages/docs/greenfield-bosun.md", import.meta.url), "utf8");
-  it("shows the bosun 0.15.0 tree and a plan that plan check accepts without warnings", () => {
+  it("shows the bosun 0.16.0 tree and a plan that plan check accepts without warnings", () => {
     for (const f of [".bosun/intake.toml", ".bosun/session-rules.toml", ".npmrc", "signer.yml"]) {
       expect(page).toContain(f);
     }
     expect(page).toContain("apps/api/tests/notes_create.test.ts");
     expect(page).toContain('"warnings": []');
-    expect(page).toContain("`bosun plan check` (0.15.0) accepts with no warnings");
-    // Steps checked against bosun 0.15.0 --help and docs.
+    expect(page).toContain("`bosun plan check` (0.16.0) accepts with no warnings");
+    // Steps checked against bosun 0.16.0 --help and docs.
     expect(page).toContain("`bosun pr <task> --ready`");
     expect(page).toContain("`bosun keygen --enroll`");
     expect(page).toContain("--keep-plan-tasks-open");
