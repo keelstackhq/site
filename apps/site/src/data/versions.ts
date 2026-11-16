@@ -3,7 +3,7 @@
 export const versions = {
   hull: "v0.12.1",
   splice: "0.6.0",
-  bosun: "0.17.0",
+  bosun: "0.18.0",
   hoist: "0.5.1",
   hoard: "v0.6.1",
   berth: "0.2.1",
@@ -13,13 +13,13 @@ export const versions = {
 export const tagCommits = {
   hull: "f59ed2bb7c30acdffc8fb14ba39273578bdb915a",
   splice: "feea8496215afce057f98eaea0e303aced93346c",
-  bosun: "0d2bcd700251773b0191af8a31062f6401c1edb1",
+  bosun: "659e827efae2b242990cb82637a343638bbc6493",
   hoist: "5f21d0d0732651999d3e33912c1a287c385ecb9b",
   hoard: "4a6d185fb73af3d973eaa256a88bc0d02c68b63a",
   berth: "cab67fa16a1107df8219a26581c7300a19a71f76",
 } as const satisfies Record<keyof typeof versions, string>;
 
-/** Fixed refs the docs templates cite (`{{ks.ref.*}}`): bosun's spec at its 0.17.0 tag, the splice action pin. */
+/** Fixed refs the docs templates cite (`{{ks.ref.*}}`): bosun's spec at its 0.18.0 tag, the splice action pin. */
 export const docRefs = {
   bosunSpec: tagCommits.bosun,
   spliceAction: tagCommits.splice,

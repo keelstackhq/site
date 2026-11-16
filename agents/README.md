@@ -6,7 +6,7 @@ You are an AI agent in the TARGET repo (the one to set up, adopt, upgrade or mov
 
 ## Use
 
-Current versions: hull v0.12.1, splice 0.6.0, bosun 0.17.0, hoist 0.5.1, hoard v0.6.1, berth 0.2.1. Machine-readable: https://keelstack.dev/agents/versions.json. Last verified 2026-11-16 against bosun 0.17.0, hull v0.12.1, splice 0.6.0.
+Current versions: hull v0.12.1, splice 0.6.0, bosun 0.18.0, hoist 0.5.1, hoard v0.6.1, berth 0.2.1. Machine-readable: https://keelstack.dev/agents/versions.json. Last verified 2026-11-16 against bosun 0.18.0, hull v0.12.1, splice 0.6.0.
 
 bosun prints exactly one JSON object on stdout: `{version, command, ok, exit_code, data, error, next}`; `error` is `{kind, message, fix}`. Do what `error.fix` says. Make the calls in `next`. Never work around a refusal. Exit codes: 0 ok, 1 error, 2 usage, 3 conflict, 4 halted, 5 needs-human, 6 limit. On exit 5 stop and tell the owner what is needed.
 
@@ -47,7 +47,7 @@ bosun prereqs plans/<name>.md                         # every human step the pla
 Install bosun first (every path assumes it):
 
 ```bash
-npm i -g @keelstackhq/bosun@0.17.0
+npm i -g @keelstackhq/bosun@0.18.0
 export GITHUB_TOKEN=$(gh auth token)   # in your shell, never in a file
 ```
 

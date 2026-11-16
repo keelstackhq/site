@@ -38,9 +38,9 @@ docs/setup-script.sh       the cloud environment's setup script
 plans/<name>.md            the plan: the only input bosun reads (`--plan` copies yours here)
 ```
 
-Descriptions follow bosun's [adopt guide](https://github.com/keelstackhq/bosun/blob/0d2bcd700251773b0191af8a31062f6401c1edb1/docs/adopt-existing-repo.md)
+Descriptions follow bosun's [adopt guide](https://github.com/keelstackhq/bosun/blob/659e827efae2b242990cb82637a343638bbc6493/docs/adopt-existing-repo.md)
 (section 3, "What lands in the repo") and its
-[layout spec](https://github.com/keelstackhq/bosun/blob/0d2bcd700251773b0191af8a31062f6401c1edb1/docs/spec/03-layout.md). For
+[layout spec](https://github.com/keelstackhq/bosun/blob/659e827efae2b242990cb82637a343638bbc6493/docs/spec/03-layout.md). For
 `session-rules.toml` see the bosun docs; the intake schema is in the layout spec. A seed is
 written once and then belongs to you; an owned file is replaced by each channel update.
 
@@ -142,7 +142,7 @@ one `UC-<ID>-<n>` line that a test can check. Human steps a plan needs go in a
    then run the `ready` skill (advisory since hull v0.11.0: it never blocks and takes defaults for unanswered onboarding questions; `.bosun/` does not exist yet, so answer `bosun` with `yes` in `docs/agents/onboarding.toml`).
 3. **Agent:** write the plan first: turn the brief into `plans/<name>.md` (the spec stays in
    `docs/superpowers/specs/`). This first plan goes in through `bosun init`:
-   `bosun init --stack rust|ts-pnpm --plan <file> --owner <login>` (bosun 0.17.0; `--stack` is
+   `bosun init --stack rust|ts-pnpm --plan <file> --owner <login>` (bosun 0.18.0; `--stack` is
    required unless you pass `--intake <file>`, which derives `--stack`, `--owner` and `--plan` from the
    owner's intake file). It opens one setup pull request, which is R-gov.
 4. **Owner:**
