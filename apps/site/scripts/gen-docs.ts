@@ -18,7 +18,10 @@ function generateFormatted(): Map<string, string> {
       mkdirSync(dirname(join(tmp, path)), { recursive: true });
       writeFileSync(join(tmp, path), content);
     }
-    execFileSync("vp", ["fmt", tmp], { cwd: root, stdio: "pipe" });
+    // Resolve vp from the repo's own node_modules, so plain `node scripts/gen-docs.ts` works too.
+    const bins = [join(root, "node_modules/.bin"), join(root, "../../node_modules/.bin")];
+    const PATH = [...bins, process.env.PATH ?? ""].join(":");
+    execFileSync("vp", ["fmt", tmp], { cwd: root, stdio: "pipe", env: { ...process.env, PATH } });
     return new Map([...map.keys()].map((p) => [p, readFileSync(join(tmp, p), "utf8")]));
   } finally {
     rmSync(tmp, { recursive: true, force: true });
