@@ -33,6 +33,10 @@ export function buildCtx(
     adoptBosunBlock: sc.adoptBosunBlock,
     upgradeBlock: sc.upgradeBlock(v),
     approveBlock: sc.approveBlock,
+    migrateBlock: sc.MIGRATE_COMMANDS,
+    humanChecksBlock: sc.humanChecksBlock,
+    verifyBlock: sc.verifyBlock(v),
+    rollbackBlock: sc.rollbackBlock,
   };
   if (refs.assessUrl && refs.assessSha) {
     ctx["assess.url"] = refs.assessUrl;

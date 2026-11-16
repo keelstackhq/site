@@ -202,3 +202,28 @@ export const SIGNED_PREREQ =
   "Signed form (works from a cloud session): a bosun release with signed approvals (0.2.1 or later) in .bosun/version, the signer's key enrolled in .bosun/approvers.toml on the default branch (bosun keygen --enroll; the enrolling PR is R-gov, so the owner approves it with a GitHub review or a plain comment, since no signed approval counts on that PR), and the PEM held by the signing session.";
 
 export const cliBlock = "bosun doctor   # each missing step with its fix";
+
+/** Human-only steps of the agent doc (agents/README.md): what an agent runs to see each one is done. */
+export const humanChecksBlock: string = [
+  "gh repo view <owner>/<repo> --json name,visibility   # the repo exists on GitHub",
+  "gh pr view <n> --json state,headRefOid,mergedAt      # setup PR: state MERGED",
+  "hoist check --area github                             # after hoist apply: no drift",
+  "bosun doctor                                          # keygen enroll, cloud setup, plan",
+  "bosun prereqs plans/<name>.md                         # every human step the plan needs",
+].join("\n");
+
+/** Each step's check; run them in the target repo after the step's own commands. */
+export const verifyBlock = (v: Versions): string =>
+  [
+    "pnpm run ci",
+    "bosun doctor   # each missing step with its fix",
+    `pnpm dlx @keelstackhq/splice@${v.splice} check   # exit 1 on drift, conflict markers or an available update`,
+    "hoist check --area github   # read-only; exit 1 on drift",
+  ].join("\n");
+
+/** Undo, from the least to the most: nothing is merged until the owner merges it. */
+export const rollbackBlock: string = [
+  "git switch <default-branch> && git branch -D <branch>   # unpushed work: drop the branch",
+  "gh pr close <n> --delete-branch                         # an open PR: close it",
+  "bosun migrate --to <tighter-mode>                       # a mode too loose: one PR to a tighter one",
+].join("\n");

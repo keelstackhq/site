@@ -5,7 +5,13 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { diffGenerated, driftMessage, existingDocs, generate } from "../src/lib/generate.ts";
+import {
+  diffGenerated,
+  driftMessage,
+  existingDocs,
+  generate,
+  outPath,
+} from "../src/lib/generate.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -30,7 +36,7 @@ function generateFormatted(): Map<string, string> {
 
 const read = (p: string): string | undefined => {
   try {
-    return readFileSync(join(root, p), "utf8");
+    return readFileSync(outPath(p), "utf8");
   } catch {
     return undefined;
   }
@@ -45,7 +51,7 @@ if (process.argv.includes("--check")) {
   }
 } else {
   for (const [p, c] of map) {
-    mkdirSync(dirname(join(root, p)), { recursive: true });
-    writeFileSync(join(root, p), c);
+    mkdirSync(dirname(outPath(p)), { recursive: true });
+    writeFileSync(outPath(p), c);
   }
 }

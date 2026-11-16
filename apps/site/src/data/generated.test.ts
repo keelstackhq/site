@@ -65,3 +65,14 @@ describe("docs-src holds no literal current pins", () => {
     expect(hits).toEqual([]);
   });
 });
+
+test("every .literal-allow entry still occurs in a docs-src file", () => {
+  const dir = join(dirname(fileURLToPath(import.meta.url)), "../../docs-src");
+  const entries = readFileSync(join(dir, ".literal-allow"), "utf8").split("\n").filter(Boolean);
+  const lines = new Set(
+    walk(dir)
+      .filter((p) => p.endsWith(".md"))
+      .flatMap((f) => readFileSync(f, "utf8").split("\n")),
+  );
+  expect(entries.filter((e) => !lines.has(e))).toEqual([]);
+});
