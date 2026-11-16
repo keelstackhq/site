@@ -1,24 +1,24 @@
 // Writes the generated docs pages from docs-src/ (`pnpm --filter @keelstackhq/site gen`).
 // `--check` renders and formats into a temp dir and exits 1 when a committed copy differs.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { diffGenerated, generate } from "../src/lib/generate.ts";
+import { diffGenerated, driftMessage, existingDocs, generate } from "../src/lib/generate.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const tmp = join(root, ".gen-tmp");
 
 /** Renders, then formats with `vp fmt` (tables re-align when a token changes width). */
 function generateFormatted(): Map<string, string> {
   const map = generate();
-  rmSync(tmp, { recursive: true, force: true });
+  const tmp = mkdtempSync(join(tmpdir(), "gen-docs-"));
   try {
     for (const [path, content] of map) {
       mkdirSync(dirname(join(tmp, path)), { recursive: true });
       writeFileSync(join(tmp, path), content);
     }
-    execFileSync("vp", ["fmt", ".gen-tmp"], { cwd: root, stdio: "pipe" });
+    execFileSync("vp", ["fmt", tmp], { cwd: root, stdio: "pipe" });
     return new Map([...map.keys()].map((p) => [p, readFileSync(join(tmp, p), "utf8")]));
   } finally {
     rmSync(tmp, { recursive: true, force: true });
@@ -35,10 +35,9 @@ const read = (p: string): string | undefined => {
 
 const map = generateFormatted();
 if (process.argv.includes("--check")) {
-  const changed = diffGenerated(map, read);
+  const changed = diffGenerated(map, read, existingDocs());
   if (changed.length > 0) {
-    console.error(`gen-docs: out of date:\n${changed.map((p) => `  ${p}`).join("\n")}`);
-    console.error("Edit docs-src/ or versions.ts, then run: pnpm --filter @keelstackhq/site gen");
+    console.error(driftMessage(changed));
     process.exit(1);
   }
 } else {
