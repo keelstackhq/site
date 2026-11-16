@@ -2,10 +2,10 @@
 layout: ../../layouts/Docs.astro
 ---
 
-A new repo, rendered from hull {{ks.hull}}, that bosun runs from the first task. This page shows the
+A new repo, rendered from hull v0.12.0, that bosun runs from the first task. This page shows the
 files you end up with, where the product spec and the plan go, who does which step, and how the
-plan turns into work. It follows bosun {{ks.bare.bosun}} (2026-11-15): the file tree and the example plan come from running
-`bosun init --no-pr` and `bosun plan check` {{ks.bare.bosun}} on a repo rendered from hull {{ks.hull}}, and every
+plan turns into work. It follows bosun 0.17.0 (2026-11-15): the file tree and the example plan come from running
+`bosun init --no-pr` and `bosun plan check` 0.17.0 on a repo rendered from hull v0.12.0, and every
 command and flag below was checked against `bosun --help`, each subcommand's `--help` and bosun's
 docs. Every owner step, with the check that
 verifies it, is in [Start a project](/docs/start-project/); the details of each step are in
@@ -62,7 +62,7 @@ bosun reads only `plans/*.md`. It has no convention for a brief or a product spe
 - The plan goes in `plans/<name>.md`, in bosun's format
   ([plan-format.md](https://github.com/keelstackhq/bosun/blob/main/docs/plan-format.md)). Its
   `project:` must equal `project` in `.bosun/bosun.toml`. A minimal plan, which
-  `bosun plan check` ({{ks.bare.bosun}}) accepts with no warnings. A task that touches `apps/api/src/` also
+  `bosun plan check` (0.17.0) accepts with no warnings. A task that touches `apps/api/src/` also
   lists a test under `apps/api/tests/`, or `plan check` warns:
 
 ```markdown
@@ -94,7 +94,7 @@ docs/superpowers/specs/2026-10-29-notes.md.
 - UC-N1-2: DELETE /notes/:id removes the note, and a second DELETE returns 404.
 ```
 
-The real output of `bosun plan check plans/notes.md` ({{ks.bare.bosun}}, exit 0, reformatted for reading), with no warnings:
+The real output of `bosun plan check plans/notes.md` (0.17.0, exit 0, reformatted for reading), with no warnings:
 
 ```json
 {

@@ -1,11 +1,10 @@
 // Copies hull's docs/start-checklist.md at a ref into src/data/hull/ (with its source and sha256)
-// and writes the "Start a project" page from it. Usage: node scripts/start-checklist.mjs <ref>
+// and writes docs-src/start-project.md, then runs scripts/gen-docs.ts (= `pnpm gen`) so the page in
+// src/pages/docs is current. Usage: node scripts/start-checklist.mjs <ref>
 // (a tag or a commit; the source records the commit). The test start-checklist.test.ts checks both.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
-
-import { writeGenerated } from "./write-generated.ts";
 
 const { tagCommits, versions } = await import("../src/data/versions.ts");
 
@@ -77,5 +76,9 @@ repo was rendered from. The full path, with the details, is in
 
 ${copy.replace(/^# .*\n\n/, "")}${NOTE}`;
 writeFileSync(new URL("../docs-src/start-project.md", import.meta.url), page);
-writeGenerated();
+// Re-render the pages (and run vp fmt) through the same path as `pnpm gen`.
+execFileSync("node", ["scripts/gen-docs.ts"], {
+  cwd: new URL("..", import.meta.url),
+  stdio: "inherit",
+});
 console.log(`start-checklist: ${repo}@${commit} sha256 ${sha256}`);

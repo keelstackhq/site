@@ -91,7 +91,7 @@ node scripts/agents-index.mjs     # hull repos: refresh the agents index
 git add -A && git commit -m "chore: add decisions channel"
 ```
 
-- **rigging** is not needed for a repo rendered from hull {{ks.hull}} or later: `base` ships the four
+- **rigging** is not needed for a repo rendered from hull v0.11.0 or later: `base` ships the four
   subagents (`.claude/agents/`). A repo rendered from hull v0.2.0 to v0.10.x that added
   `rigging --piece claude` runs `splice update --channel rigging` first, then `splice update` for
   the template. A repo not rendered from hull adds
@@ -210,7 +210,7 @@ hull's `template` already caches Turborepo through hoard, and bosun's gate workf
 ```
 
 Run the workflow on `push` to `main` as well, so pull requests start from a warm cache. For a
-cargo-only repo hoard does nothing; use `Swatinem/rust-cache@v2`. Since hoard {{ks.hoard}} the action
+cargo-only repo hoard does nothing; use `Swatinem/rust-cache@v2`. Since hoard v0.6.1 the action
 prints a notice when `TURBO_API`, `TURBO_TOKEN` or `TURBO_TEAM` are already set.
 
 On CircleCI (since hoard 0.4.0), `circleci/hoard.yml` installs a checksum-verified release and runs

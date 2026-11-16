@@ -1,0 +1,5 @@
+A new repo, rendered from hull v0.12.0, that bosun runs from the first task. This page shows the
+plan turns into work. It follows bosun 0.17.0 (2026-11-15): the file tree and the example plan come from running
+`bosun init --no-pr` and `bosun plan check` 0.17.0 on a repo rendered from hull v0.12.0, and every
+  `bosun plan check` (0.17.0) accepts with no warnings. A task that touches `apps/api/src/` also
+The real output of `bosun plan check plans/notes.md` (0.17.0, exit 0, reformatted for reading), with no warnings:

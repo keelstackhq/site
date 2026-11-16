@@ -4,16 +4,16 @@
 // src/data/hull/adopt.json, and writes the "Adopt an existing repo" page. Earlier tags stay in
 // `hosted` and in src/data/hull/assess/, since old links pin them.
 // Usage: node scripts/adopt.mjs <hull tag or commit> <assess tag, e.g. v0.6.1> [--releasing]
-// (--releasing marks hull <tag> and splice 0.4.0 as releasing now). adopt.test.ts checks it all.
+// (--releasing marks hull <tag> and splice as releasing now). It writes docs-src/adopt.md, then runs
+// scripts/gen-docs.ts (= `pnpm gen`) so src/pages/docs is current. adopt.test.ts checks it all.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 
-import { writeGenerated } from "./write-generated.ts";
-
 // Node 24 strips the types of these two dependency-free files.
 const { tagCommits, versions } = await import("../src/data/versions.ts");
-const { ADOPT_BOSUN_OWNER, ADOPT_HULL_NOTE } = await import("../src/data/scenarios.ts");
+const { ADOPT_BOSUN_OWNER, ADOPT_HULL_NOTE, adoptHullBlock } =
+  await import("../src/data/scenarios.ts");
 
 const [ref, tag, flag] = process.argv.slice(2);
 if (!ref || !/^v\d+\.\d+\.\d+$/.test(tag ?? "")) {
@@ -76,6 +76,10 @@ const commitTok = isCurrent ? "{{ks.commit.hull}}" : commit;
 const shortTok = isCurrent ? "{{ks.short.hull}}" : commit.slice(0, 7);
 const refTok = isCommit ? commit : hullTok;
 
+// Not the current release: a literal block for that ref (as before), since tokens render versions.hull.
+const shortPath = isCurrent
+  ? "{{ks.block.adoptHullBlock}}"
+  : `\`\`\`bash\n${adoptHullBlock({ ...versions, hull: isCommit ? commit : tag }, url, sha256(assess))}\n\`\`\``;
 const pending = releasing
   ? `\nUntil hull ${hullTok} and splice {{ks.splice}} are tagged, step 1 works but steps 3 and 4 do not yet:
 stop after step 2 and tell me.`
@@ -96,7 +100,7 @@ The guide below is hull's
 
 With hull: assess first, then splice adopt as a dry run.
 
-{{ks.block.adoptHullBlock}}
+${shortPath}
 
 ${ADOPT_HULL_NOTE}
 
@@ -139,5 +143,9 @@ Adopt this repo into keelstack. Work step by step, and ask me before anything th
 
 ${doc.replace(/^# .*\n\n/, "")}`;
 writeFileSync(new URL("../docs-src/adopt.md", import.meta.url), page);
-writeGenerated();
+// Re-render the pages (and run vp fmt) through the same path as `pnpm gen`.
+execFileSync("node", ["scripts/gen-docs.ts"], {
+  cwd: new URL("..", import.meta.url),
+  stdio: "inherit",
+});
 console.log(`adopt: ${repo}@${commit} doc ${sha256(doc)} assess ${url} ${sha256(assess)}`);

@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vite-plus/test";
+import { hasLiteralPin } from "../lib/pins.ts";
 import { tagCommits, versions } from "./versions.ts";
 import { diffGenerated, driftMessage } from "../lib/generate.ts";
 
@@ -38,8 +39,6 @@ test("the drift message names each file and the gen command", () => {
   expect(m).toContain("pnpm --filter @keelstackhq/site gen");
 });
 
-const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
 const walk = (d: string): string[] =>
   readdirSync(d, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? walk(join(d, e.name)) : [join(d, e.name)],
@@ -51,9 +50,6 @@ describe("docs-src holds no literal current pins", () => {
   const allow = new Set(
     walk(dir).includes(allowFile) ? readFileSync(allowFile, "utf8").split("\n") : [],
   );
-  const shas = Object.values(tagCommits).flatMap((c) => [c, c.slice(0, 7)]);
-  const pkgs = Object.entries(versions).map(([k, v]) => `@keelstackhq/${k}@${v}`);
-  const refs = [`--ref ${versions.hull}`];
 
   test("every pin is a token", () => {
     const hits: string[] = [];
@@ -62,17 +58,10 @@ describe("docs-src holds no literal current pins", () => {
         .split("\n")
         .forEach((line, i) => {
           if (allow.has(line)) return;
-          const bad =
-            shas.some((s) => new RegExp(`\\b${s}\\b`).test(line)) ||
-            [...pkgs, ...refs].some((p) => new RegExp(`${escape(p)}(?![\\w.])`).test(line));
-          if (bad) hits.push(`${relative(dir, f)}:${i + 1}: ${line.slice(0, 100)}`);
+          if (hasLiteralPin(line, versions, tagCommits))
+            hits.push(`${relative(dir, f)}:${i + 1}: ${line.slice(0, 100)}`);
         });
     }
     expect(hits).toEqual([]);
-  });
-
-  test("the check catches a literal pin", () => {
-    const line = `x @keelstackhq/splice@${versions.splice} y`;
-    expect(pkgs.some((p) => line.includes(p))).toBe(true);
   });
 });

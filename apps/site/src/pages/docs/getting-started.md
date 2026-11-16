@@ -93,7 +93,7 @@ node scripts/agents-index.mjs     # hull repos: refresh the agents index
 git add -A && git commit -m "chore: add decisions channel"
 ```
 
-- **rigging** is not needed for a repo rendered from hull v0.12.0 or later: `base` ships the four
+- **rigging** is not needed for a repo rendered from hull v0.11.0 or later: `base` ships the four
   subagents (`.claude/agents/`). A repo rendered from hull v0.2.0 to v0.10.x that added
   `rigging --piece claude` runs `splice update --channel rigging` first, then `splice update` for
   the template. A repo not rendered from hull adds
