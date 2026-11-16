@@ -7,5 +7,7 @@ const [doc] = Object.values(
   }),
 ) as string[];
 
+if (typeof doc !== "string") throw new Error("agents.md: ../../../../agents/README.md not found");
+
 export const GET = () =>
   new Response(doc, { headers: { "Content-Type": "text/markdown; charset=utf-8" } });

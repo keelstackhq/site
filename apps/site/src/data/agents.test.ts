@@ -15,8 +15,14 @@
 //  6. `--assess --json` of hull's ready.mjs has schema `hull.assess/1` with fields template
 //     (template|template-rust|null), stack (ts-pnpm|rust|null), confidence, unsure, pieces, signals,
 //     clashes, next. Source: hull docs/adopt.md at versions.hull (src/data/hull/adopt.md).
-//  7. Unverified, so TODO(copy) in the doc and no command: a machine check that the Claude GitHub App
-//     is installed, and one for the cloud environment's setup script.
+//  7. `bosun doctor` at versions.bosun: step 2 "Claude GitHub App", step 6 "setup script and version"
+//     (checks the repo file docs/setup-script.sh, not the paste). No step checks an approver key:
+//     the key is enrolled in .bosun/approvers.toml (`bosun keygen --enroll --help`).
+//  8. `stack` is null whenever `template` is null (hull adopt.md); channels only is
+//     `splice channel add gh:keelstackhq/decisions//channel --track main --piece import-project`
+//     (adopt.md step 10; flags in `splice channel add --help`); `hoist plan|apply|check --adopt`
+//     exist at versions.hoist.
+//  9. Unverified, so TODO(copy): a machine check that the cloud environment's setup script was pasted.
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,6 +58,13 @@ describe("agents/README.md", () => {
     expect(blocks.filter((b) => !known.has(b))).toEqual([]);
     expect(ctx["block.verifyBlock"]).toBeDefined();
     expect(ctx["block.rollbackBlock"]).toBeDefined();
+  });
+
+  test("has no fenced block other than bash", () => {
+    expect([...doc.matchAll(/^```(\w*)/gm)].filter((m) => m[1] !== "bash" && m[1] !== "")).toEqual(
+      [],
+    );
+    expect((doc.match(/^```/gm) ?? []).length).toBe(2 * fenced(doc).length);
   });
 
   test("agents/versions.json equals versions.ts", () => {

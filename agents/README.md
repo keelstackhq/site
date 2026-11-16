@@ -13,30 +13,32 @@ bosun prints exactly one JSON object on stdout: `{version, command, ok, exit_cod
 ## Decide
 
 1. Empty repo or no commits: path A (new repo).
-2. Existing repo with `.splice/` or `.bosun/version`: path D (upgrade). Mode change only: path C.
-3. Other existing repo: run the assess block of path B. Read `template` and `stack` in its JSON (schema `hull.assess/1`; the fields are in the table at https://raw.githubusercontent.com/keelstackhq/hull/v0.12.0/docs/adopt.md, not copied here).
-   - `template` is `template` or `template-rust`: hull adopt (B). Then bosun init with the printed `stack`.
-   - `template` is null: channels only (the decisions channel). Add bosun only when `stack` is `rust` or `ts-pnpm`.
+2. Existing repo that only needs a mode change: path C.
+3. Existing repo with `.splice/` or `.bosun/version`: path D (upgrade).
+4. Other existing repo: run the assess block of path B. Read `template` in its JSON (schema `hull.assess/1`; the fields are in the table at https://raw.githubusercontent.com/keelstackhq/hull/v0.12.0/docs/adopt.md, not copied here). `stack` is null whenever `template` is null.
+   - `template` is `template` or `template-rust`: hull adopt (B), then bosun init with the printed `stack`.
+   - `template` is null: channels only (B, channels block). Add bosun only if the owner wants it, with `--stack rust` or `--stack ts-pnpm` as the owner chooses; other stacks take the decisions channel only.
    - `confidence` low: ask the owner each `unsure` question. Never guess.
 
 ## Human-only steps
 
 Do these first. Tell the owner the whole list at once (D-009); the owner may answer in one message ("approve A B C"). After each, run its check and go on only when it passes.
 
-| Step                                                 | Where          | Agent check                                                               |
-| ---------------------------------------------------- | -------------- | ------------------------------------------------------------------------- |
-| Create and push the GitHub repo                      | phone/computer | `gh repo view`                                                            |
-| Install the Claude GitHub App on the repo            | phone/computer | TODO(copy): no machine check seen in `--help`; ask the owner              |
-| Approve the setup PR's head and merge it             | phone/computer | `gh pr view --json state`                                                 |
-| `hoist apply --area github` (needs admin rights)     | computer       | `hoist check`                                                             |
-| Paste the cloud environment's setup script (Start E) | computer       | TODO(copy): no machine check seen in `--help`; `bosun doctor` lists steps |
-| `bosun keygen --enroll` for the signing session      | computer       | `bosun doctor`                                                            |
+| Step                                                 | Where          | Agent check                                                                                                    |
+| ---------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------- |
+| Create and push the GitHub repo                      | phone/computer | `gh repo view`                                                                                                 |
+| Install the Claude GitHub App on the repo            | phone/computer | `bosun doctor` (step 2)                                                                                        |
+| Approve the setup PR's head and merge it             | phone/computer | `gh pr view --json state`                                                                                      |
+| `hoist apply --area github` (needs admin rights)     | computer       | `hoist check`                                                                                                  |
+| Paste the cloud environment's setup script (Start E) | computer       | `bosun doctor` (step 6) checks only the repo file `docs/setup-script.sh`; the paste: TODO(copy), ask the owner |
+| `bosun keygen --enroll` for the signing session      | computer       | `git show origin/HEAD:.bosun/approvers.toml` lists the key id                                                  |
 
 ```bash
 gh repo view <owner>/<repo> --json name,visibility   # the repo exists on GitHub
 gh pr view <n> --json state,headRefOid,mergedAt      # setup PR: state MERGED
-hoist check --area github                             # after hoist apply: no drift
-bosun doctor                                          # keygen enroll, cloud setup, plan
+git show origin/HEAD:.bosun/approvers.toml           # the enrolled key's id is listed
+hoist check --area github                             # after the owner's hoist apply: no drift
+bosun doctor                                          # step 2 Claude App, step 6 docs/setup-script.sh
 bosun prereqs plans/<name>.md                         # every human step the plan needs
 ```
 
@@ -70,13 +72,24 @@ hoist plan --area github          # what would change; writes nothing
 hoist apply --area github --yes   # write it, then verify like `hoist check`
 ```
 
-B. Adopt, with hull. Take `<template>` and each `<id>:<name>` from the assess JSON (`next`, `pieces`). Read the dry run's change list, then run the same splice command without `--dry-run`. Never pass `--force` unless the owner names the files it may replace. Open the PR; the owner merges it. Then bosun init (A) for `rust` or `ts-pnpm`, and hoist with `--adopt` on an existing repo.
+B. Adopt, with hull. Take `<template>` and each `<id>:<name>` from the assess JSON (`next`, `pieces`). Read the dry run's change list, then run the same splice command without `--dry-run`. Never pass `--force` unless the owner names the files it may replace. Open the PR; the owner merges it. Then bosun init (A) for `rust` or `ts-pnpm`, and hoist with `--adopt` (block below, run by the owner).
 
 ```bash
 curl -fsSL https://keelstack.dev/assess/v0.12.0.mjs -o /tmp/assess.mjs
 echo "ff1bceb19e4a6688be7d8bd5c1e8a7cf1e2633fc35a3441b17938715d3aeb878  /tmp/assess.mjs" | sha256sum -c
 node /tmp/assess.mjs --assess --json
 npx @keelstackhq/splice@0.5.1 adopt gh:keelstackhq/hull//<template> --ref v0.12.0 --piece <id>:<name> ... --dry-run --json
+```
+
+```bash
+hoist plan --area github --adopt          # what would change; writes nothing
+hoist apply --area github --adopt --yes   # write it, then verify
+```
+
+B. Adopt, channels only (no hull template; after the PR merges, then optionally bosun):
+
+```bash
+pnpm dlx @keelstackhq/splice@0.5.1 channel add gh:keelstackhq/decisions//channel --track main --piece import-project
 ```
 
 B. Adopt, with bosun alone (no hull, no splice):
@@ -96,7 +109,7 @@ bosun pr --pr <n> --ready             # after the local gates: ready + auto-merg
 bosun migrate --finish                # after the merge: join, plan amend (idempotent)
 ```
 
-D. Upgrade. bosun first, then hull, each its own PR. A repo with `.splice/channels/bosun.toml` cannot run `bosun pin` (it refuses): there `splice update --all` also moves bosun; skip the pin lines.
+D. Upgrade. bosun first, then hull, each its own PR. A repo with `.splice/channels/bosun.toml` cannot run `bosun pin` (it refuses): there `splice update --all` also moves bosun; skip the pin lines and the npm line below: install the version in `.bosun/version` instead.
 
 ```bash
 bosun pin --latest --check            # lists tools behind, downloads and writes nothing; run on the default branch
@@ -120,13 +133,13 @@ bosun approve <pr>@<40-character head SHA> --sign-key <pem>           # posts it
 
 ## Verify
 
-Run after each step; all must pass. `splice check` exits 1 also when an update is available: that is not a failure of your change, report it.
+Run each check when its step is done, not before. A red `pnpm run ci` is yours to fix. `bosun doctor` exit 5 means owner steps are pending: list them to the owner. `splice check --offline` needs `.splice/lock.toml` (not in a repo with no hull); without `--offline` it also exits 1 when an update is available, which is not a failure of your change. `hoist check` only after the owner's `hoist apply`.
 
 ```bash
-pnpm run ci
-bosun doctor   # each missing step with its fix
-pnpm dlx @keelstackhq/splice@0.5.1 check   # exit 1 on drift, conflict markers or an available update
-hoist check --area github   # read-only; exit 1 on drift
+pnpm run ci   # where the repo has it
+bosun doctor   # exit 5: owner steps pending; list them to the owner
+pnpm dlx @keelstackhq/splice@0.5.1 check --offline   # only with .splice/lock.toml; offline: an available update is not a failure
+hoist check --area github   # only after the owner's hoist apply (add --adopt on an adopted repo)
 ```
 
 ## Rollback

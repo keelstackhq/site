@@ -207,18 +207,29 @@ export const cliBlock = "bosun doctor   # each missing step with its fix";
 export const humanChecksBlock: string = [
   "gh repo view <owner>/<repo> --json name,visibility   # the repo exists on GitHub",
   "gh pr view <n> --json state,headRefOid,mergedAt      # setup PR: state MERGED",
-  "hoist check --area github                             # after hoist apply: no drift",
-  "bosun doctor                                          # keygen enroll, cloud setup, plan",
+  "git show origin/HEAD:.bosun/approvers.toml           # the enrolled key's id is listed",
+  "hoist check --area github                             # after the owner's hoist apply: no drift",
+  "bosun doctor                                          # step 2 Claude App, step 6 docs/setup-script.sh",
   "bosun prereqs plans/<name>.md                         # every human step the plan needs",
 ].join("\n");
 
-/** Each step's check; run them in the target repo after the step's own commands. */
+/** Channels only (no hull template): the decisions channel (hull docs/adopt.md, step 10). */
+export const channelsBlock = (v: Versions): string =>
+  `pnpm dlx @keelstackhq/splice@${v.splice} channel add gh:keelstackhq/decisions//channel --track main --piece import-project`;
+
+/** hoist on an existing repo: only adds, never loosens a stricter live setting. */
+export const hoistAdoptBlock: string = [
+  "hoist plan --area github --adopt          # what would change; writes nothing",
+  "hoist apply --area github --adopt --yes   # write it, then verify",
+].join("\n");
+
+/** Checks by timing; none is a failure of an agent step unless its note says so. */
 export const verifyBlock = (v: Versions): string =>
   [
-    "pnpm run ci",
-    "bosun doctor   # each missing step with its fix",
-    `pnpm dlx @keelstackhq/splice@${v.splice} check   # exit 1 on drift, conflict markers or an available update`,
-    "hoist check --area github   # read-only; exit 1 on drift",
+    "pnpm run ci   # where the repo has it",
+    "bosun doctor   # exit 5: owner steps pending; list them to the owner",
+    `pnpm dlx @keelstackhq/splice@${v.splice} check --offline   # only with .splice/lock.toml; offline: an available update is not a failure`,
+    "hoist check --area github   # only after the owner's hoist apply (add --adopt on an adopted repo)",
   ].join("\n");
 
 /** Undo, from the least to the most: nothing is merged until the owner merges it. */

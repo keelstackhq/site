@@ -34,6 +34,8 @@ export function buildCtx(
     upgradeBlock: sc.upgradeBlock(v),
     approveBlock: sc.approveBlock,
     migrateBlock: sc.MIGRATE_COMMANDS,
+    channelsBlock: sc.channelsBlock(v),
+    hoistAdoptBlock: sc.hoistAdoptBlock,
     humanChecksBlock: sc.humanChecksBlock,
     verifyBlock: sc.verifyBlock(v),
     rollbackBlock: sc.rollbackBlock,

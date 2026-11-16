@@ -11,24 +11,25 @@ bosun prints exactly one JSON object on stdout: `{version, command, ok, exit_cod
 ## Decide
 
 1. Empty repo or no commits: path A (new repo).
-2. Existing repo with `.splice/` or `.bosun/version`: path D (upgrade). Mode change only: path C.
-3. Other existing repo: run the assess block of path B. Read `template` and `stack` in its JSON (schema `hull.assess/1`; the fields are in the table at https://raw.githubusercontent.com/keelstackhq/hull/{{ks.hull}}/docs/adopt.md, not copied here).
-   - `template` is `template` or `template-rust`: hull adopt (B). Then bosun init with the printed `stack`.
-   - `template` is null: channels only (the decisions channel). Add bosun only when `stack` is `rust` or `ts-pnpm`.
+2. Existing repo that only needs a mode change: path C.
+3. Existing repo with `.splice/` or `.bosun/version`: path D (upgrade).
+4. Other existing repo: run the assess block of path B. Read `template` in its JSON (schema `hull.assess/1`; the fields are in the table at https://raw.githubusercontent.com/keelstackhq/hull/{{ks.hull}}/docs/adopt.md, not copied here). `stack` is null whenever `template` is null.
+   - `template` is `template` or `template-rust`: hull adopt (B), then bosun init with the printed `stack`.
+   - `template` is null: channels only (B, channels block). Add bosun only if the owner wants it, with `--stack rust` or `--stack ts-pnpm` as the owner chooses; other stacks take the decisions channel only.
    - `confidence` low: ask the owner each `unsure` question. Never guess.
 
 ## Human-only steps
 
 Do these first. Tell the owner the whole list at once (D-009); the owner may answer in one message ("approve A B C"). After each, run its check and go on only when it passes.
 
-| Step                                                 | Where          | Agent check                                                               |
-| ---------------------------------------------------- | -------------- | ------------------------------------------------------------------------- |
-| Create and push the GitHub repo                      | phone/computer | `gh repo view`                                                            |
-| Install the Claude GitHub App on the repo            | phone/computer | TODO(copy): no machine check seen in `--help`; ask the owner              |
-| Approve the setup PR's head and merge it             | phone/computer | `gh pr view --json state`                                                 |
-| `hoist apply --area github` (needs admin rights)     | computer       | `hoist check`                                                             |
-| Paste the cloud environment's setup script (Start E) | computer       | TODO(copy): no machine check seen in `--help`; `bosun doctor` lists steps |
-| `bosun keygen --enroll` for the signing session      | computer       | `bosun doctor`                                                            |
+| Step                                                 | Where          | Agent check                                                                                                    |
+| ---------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------- |
+| Create and push the GitHub repo                      | phone/computer | `gh repo view`                                                                                                 |
+| Install the Claude GitHub App on the repo            | phone/computer | `bosun doctor` (step 2)                                                                                        |
+| Approve the setup PR's head and merge it             | phone/computer | `gh pr view --json state`                                                                                      |
+| `hoist apply --area github` (needs admin rights)     | computer       | `hoist check`                                                                                                  |
+| Paste the cloud environment's setup script (Start E) | computer       | `bosun doctor` (step 6) checks only the repo file `docs/setup-script.sh`; the paste: TODO(copy), ask the owner |
+| `bosun keygen --enroll` for the signing session      | computer       | `git show origin/HEAD:.bosun/approvers.toml` lists the key id                                                  |
 
 {{ks.block.humanChecksBlock}}
 
@@ -48,9 +49,15 @@ After the owner merges the setup PR, the owner runs:
 
 {{ks.block.hoistBlock}}
 
-B. Adopt, with hull. Take `<template>` and each `<id>:<name>` from the assess JSON (`next`, `pieces`). Read the dry run's change list, then run the same splice command without `--dry-run`. Never pass `--force` unless the owner names the files it may replace. Open the PR; the owner merges it. Then bosun init (A) for `rust` or `ts-pnpm`, and hoist with `--adopt` on an existing repo.
+B. Adopt, with hull. Take `<template>` and each `<id>:<name>` from the assess JSON (`next`, `pieces`). Read the dry run's change list, then run the same splice command without `--dry-run`. Never pass `--force` unless the owner names the files it may replace. Open the PR; the owner merges it. Then bosun init (A) for `rust` or `ts-pnpm`, and hoist with `--adopt` (block below, run by the owner).
 
 {{ks.block.adoptHullBlock}}
+
+{{ks.block.hoistAdoptBlock}}
+
+B. Adopt, channels only (no hull template; after the PR merges, then optionally bosun):
+
+{{ks.block.channelsBlock}}
 
 B. Adopt, with bosun alone (no hull, no splice):
 
@@ -60,7 +67,7 @@ C. Change mode. Needs bosun 0.15.0 or later in the repo. One rung per PR unless 
 
 {{ks.block.migrateBlock}}
 
-D. Upgrade. bosun first, then hull, each its own PR. A repo with `.splice/channels/bosun.toml` cannot run `bosun pin` (it refuses): there `splice update --all` also moves bosun; skip the pin lines.
+D. Upgrade. bosun first, then hull, each its own PR. A repo with `.splice/channels/bosun.toml` cannot run `bosun pin` (it refuses): there `splice update --all` also moves bosun; skip the pin lines and the npm line below: install the version in `.bosun/version` instead.
 
 {{ks.block.upgradeBlock}}
 
@@ -70,7 +77,7 @@ Approvals (R-gov and other owner-class PRs): the owner approves the exact head S
 
 ## Verify
 
-Run after each step; all must pass. `splice check` exits 1 also when an update is available: that is not a failure of your change, report it.
+Run each check when its step is done, not before. A red `pnpm run ci` is yours to fix. `bosun doctor` exit 5 means owner steps are pending: list them to the owner. `splice check --offline` needs `.splice/lock.toml` (not in a repo with no hull); without `--offline` it also exits 1 when an update is available, which is not a failure of your change. `hoist check` only after the owner's `hoist apply`.
 
 {{ks.block.verifyBlock}}
 
