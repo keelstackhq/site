@@ -94,7 +94,7 @@ Run the git commands in data.commands (branch bosun-setup) and open the setup PR
 4. After that merge: `hoist apply --area github` (admin rights). Agent check: `hoist check --area github`.
 5. After that merge: Paste the setup script into the cloud environment. Agent check: `bosun doctor` step 6; else ask.
 
-Owner step 4, after the setup PR merges: create hoist.toml with `ci-ok`, `risk-check`, `review-verdict`, `main-open` in `[github] required_checks`, run `npm i -g @keelstackhq/hoist@0.5.1`, then `hoist apply --area github --adopt --yes`.
+Bosun alone, step 4 instead, after the setup PR merges: create hoist.toml with `ci-ok`, `risk-check`, `review-verdict`, `main-open` in `[github] required_checks`, run `npm i -g @keelstackhq/hoist@0.5.1`, then `hoist apply --area github --adopt --yes`.
 
 Then: install the [Claude GitHub App](https://github.com/apps/claude) (step 1); branch protection and auto-merge come from step 4 (the required check is `ci-ok`, or `bosun-ok` if a `ci-ok` job exists; adopt prints which). Run `bosun doctor` until only `plan` is left, then write `plans/<project>.md` and run `bosun plan check`. Cloud setup script: [E](#e). adopt never overwrites existing files; the owner merges the setup PR, since bosun's checks cannot run on it before its workflows are on the default branch; `plugins` may stay missing on a computer in doctor.
 Full guide: [Adopt an existing repo](/docs/adopt/).

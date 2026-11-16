@@ -45,7 +45,7 @@ npm i -g @keelstackhq/bosun@0.18.0
 export GITHUB_TOKEN=$(gh auth token)   # in your shell, never in a file
 ```
 
-Needs git, Node, `gh auth login`; pnpm unless C or B bosun alone. Use a branch, clean checkout. Blocks are exact; fill `<placeholders>` from the owner or the JSON. Each path ends in Verify.
+Needs git, Node, `gh auth login`; pnpm unless C or B bosun alone. Use a clean branch. Blocks are exact. Fill `<placeholders>` from the owner or the JSON. Each path ends in Verify.
 
 A. New repo. The owner's brief gives the name, `<owner>`, the pieces (`<id>:<name>`, e.g. `preact-app`) and the plan: after `splice new` write `plans/<name>.md` from it and `bosun plan check` it; `bosun init --plan` copies it. Rust: `//template-rust`, `--stack rust`, piece `rust-cli` (libraries need none); skip `pnpm install && pnpm run ci`; run its `.claude/skills/verify/SKILL.md` steps. For signed approvals pause before `bosun init` for step 2.
 
@@ -103,7 +103,7 @@ bosun adopt --owner <login>              # writes bosun's files; commits nothing
 bosun doctor                             # verify
 ```
 
-Owner step 4, after the setup PR merges: create hoist.toml with `ci-ok`, `risk-check`, `review-verdict`, `main-open` in `[github] required_checks`, run `npm i -g @keelstackhq/hoist@0.5.1`, then `hoist apply --area github --adopt --yes`.
+Bosun alone, step 4 instead, after the setup PR merges: create hoist.toml with `ci-ok`, `risk-check`, `review-verdict`, `main-open` in `[github] required_checks`, run `npm i -g @keelstackhq/hoist@0.5.1`, then `hoist apply --area github --adopt --yes`.
 
 C. Change mode. Needs bosun 0.15.0 or later in the repo. No `bosun init` or new plan: `--finish` amends open epics' plans (`--plan <file>` adds one). One rung per PR unless the owner says `--direct`; the owner approves the PR head.
 

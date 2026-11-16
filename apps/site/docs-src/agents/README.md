@@ -34,7 +34,7 @@ Install bosun first (every path assumes it):
 
 {{ks.block.installBlock}}
 
-Needs git, Node, `gh auth login`; pnpm unless C or B bosun alone. Use a branch, clean checkout. Blocks are exact; fill `<placeholders>` from the owner or the JSON. Each path ends in Verify.
+Needs git, Node, `gh auth login`; pnpm unless C or B bosun alone. Use a clean branch. Blocks are exact. Fill `<placeholders>` from the owner or the JSON. Each path ends in Verify.
 
 A. New repo. The owner's brief gives the name, `<owner>`, the pieces (`<id>:<name>`, e.g. `preact-app`) and the plan: after `splice new` write `plans/<name>.md` from it and `bosun plan check` it; `bosun init --plan` copies it. Rust: `//template-rust`, `--stack rust`, piece `rust-cli` (libraries need none); skip `pnpm install && pnpm run ci`; run its `.claude/skills/verify/SKILL.md` steps. For signed approvals pause before `bosun init` for step 2.
 
