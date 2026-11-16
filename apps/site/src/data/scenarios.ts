@@ -64,7 +64,7 @@ export const MIGRATE_COMMANDS = [
   "bosun migrate --to <mode> [--direct]  # one PR, local gates, ready + auto-merge; --direct skips rungs",
   "bosun migrate --to <mode> --no-ready  # instead: the draft PR only",
   "bosun pr --pr <n> --ready             # only after --no-ready; n = data.pr; after the gates",
-  "bosun migrate --finish                # after the merge: join, plan amend (idempotent)",
+  "bosun migrate --finish                # after the merge: join, plan amend",
   "bosun doctor                          # verify",
 ].join("\n");
 
@@ -142,8 +142,8 @@ export const newRepoBlock = (v: Versions): string =>
   [
     `pnpm dlx @keelstackhq/splice@${v.splice} new gh:keelstackhq/hull//template my-repo --ref ${v.hull} --piece <id>:<name> ...`,
     "cd my-repo && pnpm install && pnpm run ci",
-    'git add -A && git commit -m "chore: render from hull"   # splice new only runs git init',
-    "gh repo create <owner>/my-repo --private --source . --push   # before bosun init; <owner> from the owner's brief",
+    'git add -A && git commit -m "chore: render from hull"   # commit the render and its lockfile (`splice new --commit` skips the lockfile)',
+    "gh repo create <owner>/my-repo --private --source . --push   # before bosun init; <owner> from the brief",
     "bosun init --stack ts-pnpm --plan plans/<name>.md --owner <login>   # opens the setup PR",
     "bosun doctor",
   ].join("\n");
@@ -167,7 +167,7 @@ export const HUMAN_STEPS: readonly HumanStep[] = [
   {
     when: "Before setup PR",
     what: "Signing key (optional): `bosun keygen --enroll`",
-    check: "`git show origin/<default>:.bosun/approvers.toml`",
+    check: "`gh pr diff <n> --name-only`",
   },
   {
     when: "Setup PR open",
@@ -182,12 +182,16 @@ export const HUMAN_STEPS: readonly HumanStep[] = [
   {
     when: "After that merge",
     what: "Paste the setup script into the cloud environment",
-    check: "`bosun doctor` step 6 (repo file only); ask",
+    check: "`bosun doctor` step 6; else ask",
   },
 ];
 
 export const HUMAN_STEPS_NOTE =
-  "The owner merges; agents never merge. The setup script is the short one in Start E: https://keelstack.dev/docs/start/#e (`bosun setup-snippet` prints it). The enrolling key stays in the signing session; the setup PR carries `.bosun/approvers.toml`.";
+  "The owner merges; agents never merge. Step 4 also sets branch protection and auto-merge; an existing repo takes `--adopt`. Setup script: Start E, https://keelstack.dev/docs/start/#e.";
+
+/** Bosun alone has no hoist.toml: bosun adopt's own owner step for branch protection. */
+export const BOSUN_ALONE_HOIST =
+  "No hoist.toml (bosun alone): step 4 first lists `ci-ok`, `risk-check`, `review-verdict`, `main-open` in hoist.toml `[github] required_checks`, then `hoist apply --area github --adopt --yes`.";
 
 export const humanStepsTable = (steps: readonly HumanStep[] = HUMAN_STEPS): string =>
   [
@@ -235,8 +239,8 @@ export const ADOPT_BOSUN_OWNER =
 
 export const upgradeBlock = (v: Versions): string =>
   [
-    "bosun pin --latest --check            # lists tools behind, downloads and writes nothing; run on the default branch",
-    "bosun pin --latest --pr               # verifies npm sha512, opens a draft PR; the owner approves",
+    "bosun pin --latest --check            # tools behind; writes nothing; run on the default branch",
+    "bosun pin --latest --pr               # checks npm sha512, opens a draft PR; the owner approves",
     "# after it merges, on your machine (<new> = the version pin --check printed):",
     "npm i -g @keelstackhq/bosun@<new> && bosun --version",
     "# then hull, on its own branch:",
@@ -250,9 +254,9 @@ export const UPGRADE_NOTE =
   "Do bosun first, then hull; each is its own PR and each is R-gov (`.bosun/**`, `.claude/**`, `.splice/**`), so the owner approves each head as in F. A repo set up with bosun init or hull has .splice/channels/bosun.toml and cannot run bosun pin (it refuses, exit 1): there `splice update --all` below also updates the bosun channel (or `splice update --channel bosun` alone), so skip the bosun pin lines and the npm line; install the bosun version the merged channel update put in .bosun/version. The bosun pin lines are for a repo set up with bosun adopt. Cloud sessions run the repo's own setup script, whose tool pins come with the bosun release: bosun 0.18.0's script pins splice 0.6.0, hoist 0.5.1 and berth 0.2.1, so a cloud session runs those until a later bosun release moves them. Merge only when ci-ok is green.";
 
 export const approveBlock: string = [
-  "bosun approve --list                                          # ready PRs and heads; writes nothing",
+  "bosun approve --list   # ready PRs and heads",
   "bosun approve <pr>@<40-character head SHA> --sign-key <pem> --print   # shows the signed comment",
-  "bosun approve <pr>@<40-character head SHA> --sign-key <pem>           # posts it",
+  "bosun approve <pr>@<40-character head SHA> --sign-key <pem>   # posts it",
 ].join("\n");
 
 export const SIGNED_PREREQ =
@@ -274,14 +278,14 @@ export const hoistAdoptBlock: string = [
 export const verifyBlock = (v: Versions): string =>
   [
     "pnpm run ci   # where the repo has it",
-    "bosun doctor   # exit 5: owner steps pending; list them",
+    "bosun doctor   # exit 5: owner steps pending",
     `pnpm dlx @keelstackhq/splice@${v.splice} check --offline   # needs .splice/lock.toml`,
     "hoist check --area github   # after owner step 4 (--adopt on an adopted repo)",
   ].join("\n");
 
 /** Undo, from the least to the most: nothing is merged until the owner merges it. */
 export const rollbackBlock: string = [
-  "git switch <default-branch> && git branch -D <branch>   # unpushed work: drop the branch",
-  "gh pr close <n> --delete-branch                         # an open PR: close it",
-  "bosun migrate --to <tighter-mode>                       # a mode too loose: one PR to a tighter one",
+  "git switch <default-branch> && git branch -D <branch>   # unpushed: drop the branch",
+  "gh pr close <n> --delete-branch                         # open PR: close it",
+  "bosun migrate --to <tighter-mode>                       # mode too loose: one PR tighter",
 ].join("\n");

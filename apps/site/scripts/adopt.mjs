@@ -112,6 +112,8 @@ ${ADOPT_BOSUN_OWNER}
 
 {{ks.humanSteps.list}}
 
+{{ks.humanSteps.alone}}
+
 ## Use Claude
 
 Paste this into Claude Code in the repo you want to adopt. It runs the read-only assessment

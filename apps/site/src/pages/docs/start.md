@@ -34,13 +34,13 @@ Needs git, Node, and `gh auth login` done once (token scopes: repo, workflow). R
 
 Needs [Setup](#setup), and pnpm.
 
-The owner's brief gives the repo name, `<owner>`, the pieces (`<id>:<name>`; `//template` ids such as `preact-app`, `astro-site`, `hono-worker`) and the plan. After `splice new`, write `plans/<name>.md` in the new repo from that brief (`bosun plan check` it): `bosun init --plan` copies it to `plans/`. For a Rust repo use `//template-rust`, `--stack rust` and the piece `rust-cli` (library crates need none); it has no package.json, so skip the pnpm lines (TODO(copy): its check command).
+The owner's brief gives the repo name, `<owner>`, the pieces (`<id>:<name>`; `//template` ids such as `preact-app`, `astro-site`, `hono-worker`) and the plan. After `splice new`, write `plans/<name>.md` in the new repo from that brief (`bosun plan check` it): `bosun init --plan` copies it to `plans/`. For a Rust repo use `//template-rust`, `--stack rust` and the piece `rust-cli` (library crates need none); it has no package.json, so skip `pnpm install && pnpm run ci` (TODO(copy): its check command). For signed approvals pause before `bosun init` for step 2.
 
 ```bash
 pnpm dlx @keelstackhq/splice@0.6.0 new gh:keelstackhq/hull//template my-repo --ref v0.12.1 --piece <id>:<name> ...
 cd my-repo && pnpm install && pnpm run ci
-git add -A && git commit -m "chore: render from hull"   # splice new only runs git init
-gh repo create <owner>/my-repo --private --source . --push   # before bosun init; <owner> from the owner's brief
+git add -A && git commit -m "chore: render from hull"   # commit the render and its lockfile (`splice new --commit` skips the lockfile)
+gh repo create <owner>/my-repo --private --source . --push   # before bosun init; <owner> from the brief
 bosun init --stack ts-pnpm --plan plans/<name>.md --owner <login>   # opens the setup PR
 bosun doctor
 ```
@@ -48,12 +48,12 @@ bosun doctor
 The agent runs every command above, gh repo create included (as the owner's gh login). Owner steps, in order, each with the check an agent runs; the hoist commands are step 4, run on the owner's machine in a checkout of the default branch:
 
 1. Before setup PR: Install the Claude GitHub App on the repo. Agent check: `bosun doctor` step 2, once the app has acted.
-2. Before setup PR: Signing key (optional): `bosun keygen --enroll`. Agent check: `git show origin/<default>:.bosun/approvers.toml`.
+2. Before setup PR: Signing key (optional): `bosun keygen --enroll`. Agent check: `gh pr diff <n> --name-only`.
 3. Setup PR open: Approve the setup PR's head and merge it. Agent check: `gh pr view <n> --json state`.
 4. After that merge: `hoist apply --area github` (admin rights). Agent check: `hoist check --area github`.
-5. After that merge: Paste the setup script into the cloud environment. Agent check: `bosun doctor` step 6 (repo file only); ask.
+5. After that merge: Paste the setup script into the cloud environment. Agent check: `bosun doctor` step 6; else ask.
 
-The owner merges; agents never merge. The setup script is the short one in Start E: https://keelstack.dev/docs/start/#e (`bosun setup-snippet` prints it). The enrolling key stays in the signing session; the setup PR carries `.bosun/approvers.toml`.
+The owner merges; agents never merge. Step 4 also sets branch protection and auto-merge; an existing repo takes `--adopt`. Setup script: Start E, https://keelstack.dev/docs/start/#e.
 
 ```bash
 npm install -g @keelstackhq/hoist@0.5.1
@@ -89,12 +89,14 @@ bosun doctor                             # verify
 Run the git commands in data.commands (branch bosun-setup) and open the setup PR. Owner steps, in order, each with the check an agent runs (the owner merges the setup PR; agents never merge):
 
 1. Before setup PR: Install the Claude GitHub App on the repo. Agent check: `bosun doctor` step 2, once the app has acted.
-2. Before setup PR: Signing key (optional): `bosun keygen --enroll`. Agent check: `git show origin/<default>:.bosun/approvers.toml`.
+2. Before setup PR: Signing key (optional): `bosun keygen --enroll`. Agent check: `gh pr diff <n> --name-only`.
 3. Setup PR open: Approve the setup PR's head and merge it. Agent check: `gh pr view <n> --json state`.
 4. After that merge: `hoist apply --area github` (admin rights). Agent check: `hoist check --area github`.
-5. After that merge: Paste the setup script into the cloud environment. Agent check: `bosun doctor` step 6 (repo file only); ask.
+5. After that merge: Paste the setup script into the cloud environment. Agent check: `bosun doctor` step 6; else ask.
 
-Then, in the setup PR's repo settings: install the [Claude GitHub App](https://github.com/apps/claude), protect the default branch with the required checks `ci-ok` (`bosun-ok` if a `ci-ok` job exists; adopt prints which), `risk-check`, `review-verdict` and `main-open`, and turn on Allow auto-merge. Run `bosun doctor` until only `plan` is left, then write `plans/<project>.md` and run `bosun plan check`. Cloud setup script: [E](#e). adopt never overwrites existing files; the owner merges the setup PR, since bosun's checks cannot run on it before its workflows are on the default branch; `plugins` may stay missing on a computer in doctor.
+No hoist.toml (bosun alone): step 4 first lists `ci-ok`, `risk-check`, `review-verdict`, `main-open` in hoist.toml `[github] required_checks`, then `hoist apply --area github --adopt --yes`.
+
+Then: install the [Claude GitHub App](https://github.com/apps/claude) (step 1); branch protection and auto-merge come from step 4 (the required check is `ci-ok`, or `bosun-ok` if a `ci-ok` job exists; adopt prints which). Run `bosun doctor` until only `plan` is left, then write `plans/<project>.md` and run `bosun plan check`. Cloud setup script: [E](#e). adopt never overwrites existing files; the owner merges the setup PR, since bosun's checks cannot run on it before its workflows are on the default branch; `plugins` may stay missing on a computer in doctor.
 Full guide: [Adopt an existing repo](/docs/adopt/).
 
 <a id="c"></a>
@@ -110,7 +112,7 @@ bosun migrate --to <mode> --dry-run   # survey and planned edits; writes nothing
 bosun migrate --to <mode> [--direct]  # one PR, local gates, ready + auto-merge; --direct skips rungs
 bosun migrate --to <mode> --no-ready  # instead: the draft PR only
 bosun pr --pr <n> --ready             # only after --no-ready; n = data.pr; after the gates
-bosun migrate --finish                # after the merge: join, plan amend (idempotent)
+bosun migrate --finish                # after the merge: join, plan amend
 bosun doctor                          # verify
 ```
 
@@ -123,8 +125,8 @@ Needs a repo that already runs bosun 0.15.0 or later (`.bosun/version`; else set
 Needs [Setup](#setup).
 
 ```bash
-bosun pin --latest --check            # lists tools behind, downloads and writes nothing; run on the default branch
-bosun pin --latest --pr               # verifies npm sha512, opens a draft PR; the owner approves
+bosun pin --latest --check            # tools behind; writes nothing; run on the default branch
+bosun pin --latest --pr               # checks npm sha512, opens a draft PR; the owner approves
 # after it merges, on your machine (<new> = the version pin --check printed):
 npm i -g @keelstackhq/bosun@<new> && bosun --version
 # then hull, on its own branch:
@@ -187,9 +189,9 @@ A high-risk PR needs the owner to approve its exact head: governance paths (R-go
 Signed form (works from a cloud session): a bosun release with signed approvals (0.2.1 or later) in .bosun/version, the signer's key enrolled in .bosun/approvers.toml on the default branch (bosun keygen --enroll; the enrolling PR is R-gov, so the owner approves it with a GitHub review or a plain comment, since no signed approval counts on that PR), and the PEM held by the signing session.
 
 ```bash
-bosun approve --list                                          # ready PRs and heads; writes nothing
+bosun approve --list   # ready PRs and heads
 bosun approve <pr>@<40-character head SHA> --sign-key <pem> --print   # shows the signed comment
-bosun approve <pr>@<40-character head SHA> --sign-key <pem>           # posts it
+bosun approve <pr>@<40-character head SHA> --sign-key <pem>   # posts it
 ```
 
 A review that requests changes (or was dismissed) withdraws comment, signed and delegate approvals; a later approving review ends that state. After it is settled, comment `/bosun recheck` or re-run the `risk` workflow. Slack never approves.
