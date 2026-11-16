@@ -13,13 +13,15 @@ With hull: assess first, then splice adopt as a dry run.
 
 {{ks.block.adoptHullBlock}}
 
-Read the change list, then run the same splice command without --dry-run. Never pass --force unless the owner names the files it may replace. Open the PR; the owner merges it. After the merge, for a Rust or ts-pnpm stack run bosun init --stack rust|ts-pnpm --plan plans/<name>.md --owner <login> (plan as in A; bosun adopt below is for repos without hull) and the hoist steps of A, but on an existing repo run `hoist plan --area github --adopt`, then `hoist apply --area github --adopt --yes` (`--adopt` keeps stricter live settings and never loosens them; hoist apply sets the ci-ok ruleset).
+Read the change list, then run the same splice command without --dry-run. Never pass --force unless the owner names the files it may replace. Open the PR; the owner merges it. After the merge, for a Rust or ts-pnpm stack run bosun init --stack rust|ts-pnpm --plan plans/<name>.md --owner <login> (the plan comes from the owner's brief, as in A; bosun adopt below is for repos without hull) and the hoist steps of A, but on an existing repo run `hoist plan --area github --adopt`, then `hoist apply --area github --adopt --yes` (`--adopt` keeps stricter live settings and never loosens them; hoist apply sets the ci-ok ruleset).
 
 With bosun alone (no hull, no splice), after the install in [Setup](/docs/start/#setup):
 
 {{ks.block.adoptBosunBlock}}
 
-Owner: before the setup PR, the session that will sign approvals runs bosun keygen --enroll (in its own container or machine: the private key never leaves it) and you commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.
+Run the git commands in data.commands (branch bosun-setup) and open the setup PR. Owner steps, in order, each with the check an agent runs (the owner merges the setup PR; agents never merge):
+
+{{ks.humanSteps.list}}
 
 ## Use Claude
 
@@ -41,7 +43,7 @@ Adopt this repo into keelstack. Work step by step, and ask me before anything th
    item yourself. Tell me that keeping an owned base file (for example ci.yml) blocks adopt
    without --force: keeping one means channels only, or adopting it later (adopt.md).
 3. Create a new branch with a clean working tree, move code into place as I confirmed, then run
-   npx @keelstackhq/splice@{{ks.bare.splice}} adopt gh:keelstackhq/hull//<template> --ref {{ks.hull}} --piece <id>:<name> ... --dry-run --json
+   pnpm dlx @keelstackhq/splice@{{ks.bare.splice}} adopt gh:keelstackhq/hull//<template> --ref {{ks.hull}} --piece <id>:<name> ... --dry-run --json
    and show me the change list by action: refuse, replace, merge, conflict, create, skip.
 4. Only after I confirm: run the same command without --dry-run, resolve the conflicts, run the
    ready skill, and open a pull request with the change list and my choices. Never pass --force

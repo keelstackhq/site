@@ -29,6 +29,9 @@ export function buildCtx(
   for (const [k, val] of Object.entries(readSetupScript())) ctx[`script.${k}`] = val;
   ctx.verifiedOn = verified;
   ctx.verified = verifiedLine(v, verified);
+  ctx["humanSteps.table"] = sc.humanStepsTable();
+  ctx["humanSteps.list"] = sc.humanStepsList();
+  ctx["humanSteps.note"] = sc.HUMAN_STEPS_NOTE;
   // One line per builder; add new ones here.
   const blocks: Record<string, string> = {
     installBlock: sc.installBlock(v),
@@ -40,7 +43,7 @@ export function buildCtx(
     migrateBlock: sc.MIGRATE_COMMANDS,
     channelsBlock: sc.channelsBlock(v),
     hoistAdoptBlock: sc.hoistAdoptBlock,
-    humanChecksBlock: sc.humanChecksBlock,
+    adoptHullRunBlock: sc.adoptHullRunBlock(v),
     verifyBlock: sc.verifyBlock(v),
     rollbackBlock: sc.rollbackBlock,
   };

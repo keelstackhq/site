@@ -27,13 +27,17 @@ Needs git, Node, and `gh auth login` done once (token scopes: repo, workflow). R
 
 ## A. New repo from hull and bosun
 
-Needs [Setup](#setup).
+Needs [Setup](#setup), and pnpm.
 
-After `splice new`, write `plans/<name>.md` in the new repo from the owner's brief (`bosun plan check` it): `bosun init` needs it. Use `//template-rust` and `--stack rust` for a Rust repo; piece ids and `my-repo` are your choices.
+The owner's brief gives the repo name, `<owner>`, the pieces (`<id>:<name>`; `//template` ids such as `preact-app`, `astro-site`, `hono-worker`) and the plan. After `splice new`, write `plans/<name>.md` in the new repo from that brief (`bosun plan check` it): `bosun init --plan` copies it to `plans/`. For a Rust repo use `//template-rust`, `--stack rust` and the piece `rust-cli` (library crates need none); it has no package.json, so skip the pnpm lines (TODO(copy): its check command).
 
 {{ks.block.newRepoBlock}}
 
-Owner: create and push the GitHub repo before bosun init (Start a project, item 1); approve the setup PR's head and merge it; then, on your machine in a checkout of the default branch:
+The agent runs every command above, gh repo create included (as the owner's gh login). Owner steps, in order, each with the check an agent runs; the hoist commands are step 4, run on the owner's machine in a checkout of the default branch:
+
+{{ks.humanSteps.list}}
+
+{{ks.humanSteps.note}}
 
 {{ks.block.hoistBlock}}
 
@@ -47,14 +51,17 @@ With hull: from the repo root on a new branch with a clean tree, assess first, t
 
 {{ks.block.adoptHullBlock}}
 
-Read the change list, then run the same splice command without --dry-run. Never pass --force unless the owner names the files it may replace. Open the PR; the owner merges it. After the merge, for a Rust or ts-pnpm stack run bosun init --stack rust|ts-pnpm --plan plans/<name>.md --owner <login> (plan as in A; bosun adopt below is for repos without hull) and the hoist steps of A, but on an existing repo run `hoist plan --area github --adopt`, then `hoist apply --area github --adopt --yes` (`--adopt` keeps stricter live settings and never loosens them; hoist apply sets the ci-ok ruleset).
+Read the change list, then run the same splice command without --dry-run. Never pass --force unless the owner names the files it may replace. Open the PR; the owner merges it. After the merge, for a Rust or ts-pnpm stack run bosun init --stack rust|ts-pnpm --plan plans/<name>.md --owner <login> (the plan comes from the owner's brief, as in A; bosun adopt below is for repos without hull) and the hoist steps of A, but on an existing repo run `hoist plan --area github --adopt`, then `hoist apply --area github --adopt --yes` (`--adopt` keeps stricter live settings and never loosens them; hoist apply sets the ci-ok ruleset).
 
 With bosun alone (no hull, no splice), after [Setup](#setup):
 
 {{ks.block.adoptBosunBlock}}
 
-Owner: before the setup PR, the session that will sign approvals runs bosun keygen --enroll (in its own container or machine: the private key never leaves it) and you commit .bosun/approvers.toml in the setup PR; run the git commands in data.commands (branch bosun-setup), open the setup PR and merge it yourself.
-Then, in the setup PR's repo settings: install the [Claude GitHub App](https://github.com/apps/claude), protect the default branch with the required checks `ci-ok` (`bosun-ok` if a `ci-ok` job exists; adopt prints which), `risk-check`, `review-verdict` and `main-open`, and turn on Allow auto-merge. Run `bosun doctor` until only `plan` is left, then write `plans/<project>.md` and run `bosun plan check`. Cloud setup script: [E](#e). adopt never overwrites existing files; merge the setup PR yourself, since bosun's checks cannot run on it before its workflows are on the default branch; `plugins` may stay missing on a computer in doctor.
+Run the git commands in data.commands (branch bosun-setup) and open the setup PR. Owner steps, in order, each with the check an agent runs (the owner merges the setup PR; agents never merge):
+
+{{ks.humanSteps.list}}
+
+Then, in the setup PR's repo settings: install the [Claude GitHub App](https://github.com/apps/claude), protect the default branch with the required checks `ci-ok` (`bosun-ok` if a `ci-ok` job exists; adopt prints which), `risk-check`, `review-verdict` and `main-open`, and turn on Allow auto-merge. Run `bosun doctor` until only `plan` is left, then write `plans/<project>.md` and run `bosun plan check`. Cloud setup script: [E](#e). adopt never overwrites existing files; the owner merges the setup PR, since bosun's checks cannot run on it before its workflows are on the default branch; `plugins` may stay missing on a computer in doctor.
 Full guide: [Adopt an existing repo](/docs/adopt/).
 
 <a id="c"></a>
@@ -65,14 +72,9 @@ Needs [Setup](#setup).
 
 Modes run gatekeeper, steady, booster, autonomous. One PR per move.
 
-```bash
-bosun migrate --to <mode> --dry-run   # survey and planned edits; writes nothing
-bosun migrate --to <mode> [--direct]  # one governance PR (draft); --direct skips the rungs between
-bosun pr --pr <n> --ready             # n = data.pr from migrate's JSON; after the local gates: ready + auto-merge
-bosun migrate --finish                # after the merge: join, plan amend (idempotent)
-```
+{{ks.block.migrateBlock}}
 
-Needs a repo that already runs bosun 0.15.0 or later. Use `--direct` only when the owner says so; otherwise one rung per PR, `--finish` after each merge. Owner: approve the one PR head as in [F](#f) (R-gov, and R-weaken for a less strict mode). Ladder, knobs and the two-line prompt for Claude: [Move a repo to bosun booster](https://keelstack.dev/migrate/).
+Needs a repo that already runs bosun 0.15.0 or later (`.bosun/version`; else set bosun up first, B). No `bosun init` and no plan to write: `--finish` amends the plans of open epics (`--plan <file>` adds one). Use `--direct` only when the owner says so; otherwise one rung per PR, `--finish` after each merge. Owner: approve the one PR head as in [F](#f) (R-gov, and R-weaken for a less strict mode). Ladder, knobs and the two-line prompt for Claude: [Move a repo to bosun booster](https://keelstack.dev/migrate/).
 
 <a id="d"></a>
 

@@ -29,6 +29,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vite-plus/test";
 import { buildLlmsTxt } from "../lib/llms.ts";
 import { buildCtx } from "../lib/render.ts";
+import { HUMAN_STEPS } from "./scenarios.ts";
 import { docRefs, versions } from "./versions.ts";
 
 const site = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -96,6 +97,55 @@ describe("agents/README.md", () => {
   test("names no client and leaves gaps as TODO(copy)", () => {
     expect(doc).toContain("TODO(copy)");
     expect(doc).not.toMatch(/Opus|Sonnet|Haiku/);
+  });
+});
+
+const start = readFileSync(join(site, "src/pages/docs/start.md"), "utf8");
+const sect = (from: RegExp, to: RegExp): string => {
+  const a = doc.search(from);
+  const rest = doc.slice(a + 1);
+  return doc.slice(a, a + 1 + rest.search(to));
+};
+
+describe("agents/README.md, review round 1b", () => {
+  test("Decide: C is checked before D (explicit tie-break), and bosun alone is reachable", () => {
+    const decide = sect(/^## Decide/m, /^## Human/m);
+    expect(decide.indexOf("path C")).toBeGreaterThan(-1);
+    expect(decide.indexOf("path C")).toBeLessThan(decide.indexOf("path D"));
+    expect(decide).toMatch(/\.bosun\/version[^\n]*mode change[^\n]*path C/);
+    expect(decide).toContain("before D");
+    expect(decide).toContain("bosun adopt");
+  });
+
+  test("human steps: one data source, in order, rendered in both the agent doc and /docs/start", () => {
+    let at = -1;
+    for (const s of HUMAN_STEPS) {
+      const i = doc.indexOf(s.what);
+      expect(i, s.what).toBeGreaterThan(at);
+      at = i;
+      expect(start).toContain(s.what);
+    }
+    expect(doc).not.toMatch(/\| *Create and push/);
+    const keygen = HUMAN_STEPS.findIndex((s) => s.what.includes("keygen --enroll"));
+    const merge = HUMAN_STEPS.findIndex((s) => s.what.includes("setup PR"));
+    expect(keygen).toBeGreaterThan(-1);
+    expect(keygen).toBeLessThan(merge);
+    expect(start).not.toMatch(/merge the setup PR yourself|merge it yourself/);
+  });
+
+  test("the plan's source is stated on A, B and C; pnpm is a prerequisite", () => {
+    expect(doc.match(/owner's brief/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(doc).toMatch(/Needs[^\n]*pnpm/);
+    expect(doc).not.toContain("npx ");
+    expect(doc).toContain("pnpm dlx");
+  });
+
+  test("C: bosun pr --ready only with --no-ready; verify after adopt, migrate", () => {
+    expect(doc).toMatch(/--no-ready[\s\S]*bosun pr --pr <n> --ready/);
+    expect(doc).toMatch(/--finish[^\n]*\n[^\n]*bosun doctor/);
+    expect(doc).toContain("splice@" + versions.splice.replace(/^v/, "") + " check --offline");
+    expect(doc).toContain("keelstack.dev/docs/start/#e");
+    expect(doc).not.toMatch(/paste: TODO/);
   });
 });
 

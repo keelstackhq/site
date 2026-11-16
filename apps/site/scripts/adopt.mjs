@@ -110,6 +110,8 @@ With bosun alone (no hull, no splice), after the install in [Setup](/docs/start/
 
 ${ADOPT_BOSUN_OWNER}
 
+{{ks.humanSteps.list}}
+
 ## Use Claude
 
 Paste this into Claude Code in the repo you want to adopt. It runs the read-only assessment
@@ -130,7 +132,7 @@ Adopt this repo into keelstack. Work step by step, and ask me before anything th
    item yourself. Tell me that keeping an owned base file (for example ci.yml) blocks adopt
    without --force: keeping one means channels only, or adopting it later (adopt.md).
 3. Create a new branch with a clean working tree, move code into place as I confirmed, then run
-   npx @keelstackhq/splice@{{ks.bare.splice}} adopt gh:keelstackhq/hull//<template> --ref ${refTok} --piece <id>:<name> ... --dry-run --json
+   pnpm dlx @keelstackhq/splice@{{ks.bare.splice}} adopt gh:keelstackhq/hull//<template> --ref ${refTok} --piece <id>:<name> ... --dry-run --json
    and show me the change list by action: refuse, replace, merge, conflict, create, skip.
 4. Only after I confirm: run the same command without --dry-run, resolve the conflicts, run the
    ready skill, and open a pull request with the change list and my choices. Never pass --force
