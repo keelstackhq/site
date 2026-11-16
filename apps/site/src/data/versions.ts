@@ -19,10 +19,14 @@ export const tagCommits = {
   berth: "cab67fa16a1107df8219a26581c7300a19a71f76",
 } as const satisfies Record<keyof typeof versions, string>;
 
-/** Fixed refs the docs templates cite (`{{ks.ref.*}}`): bosun's spec at its 0.18.0 tag, the splice action pin. */
+/**
+ * Fixed refs the docs templates cite (`{{ks.ref.*}}`): bosun's spec at its 0.18.0 tag; the splice action
+ * pin is what bosun v0.18.0's channel seeds (splice.yml); bump when a bosun release seeds a newer action.
+ */
 export const docRefs = {
   bosunSpec: tagCommits.bosun,
-  spliceAction: tagCommits.splice,
+  spliceAction: "8dcdf9a9faf35cd5b504c326c9107f8da689264e",
+  spliceActionVersion: "0.5.1",
 } as const;
 
 /** The date the versions above were last checked against their tags and docs. */

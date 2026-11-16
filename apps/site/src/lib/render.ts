@@ -24,6 +24,7 @@ export function buildCtx(
   }
   ctx["ref.bosunSpec"] = refs.bosunSpec;
   ctx["ref.spliceAction"] = refs.spliceAction;
+  ctx["ref.spliceActionVersion"] = refs.spliceActionVersion;
   ctx.verified = verifiedLine(v, verified);
   // One line per builder; add new ones here.
   const blocks: Record<string, string> = {

@@ -74,7 +74,7 @@ A channel is a second template applied next to the main one (or alone), with its
   repo, hull owns `.claude/settings.json`, so the hooks come from hull instead (since v0.3.0,
   guarded so they do nothing in a repo without bosun).
 
-The splice update bot (`keelstackhq/splice/action@feea8496215afce057f98eaea0e303aced93346c # v0.6.0`) runs `splice update --all` on a schedule
+The splice update bot (`keelstackhq/splice/action@8dcdf9a9faf35cd5b504c326c9107f8da689264e # v0.5.1`) runs `splice update --all` on a schedule
 and opens one pull request with the changes to the template and every channel.
 
 ### bosun runs the work on GitHub

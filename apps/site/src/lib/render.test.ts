@@ -21,6 +21,9 @@ test("derived keys", () => {
   expect(ctx["short.bosun"]).toHaveLength(7);
   expect(ctx["ref.bosunSpec"]).toBe(docRefs.bosunSpec);
   expect(ctx["ref.spliceAction"]).toBe(docRefs.spliceAction);
+  expect(ctx["ref.spliceActionVersion"]).toBe(docRefs.spliceActionVersion);
+  // The action pin is what bosun's channel seeds, not the current splice tag.
+  expect(ctx["ref.spliceAction"]).not.toBe(tagCommits.splice);
   expect(ctx.verified).toContain("Last verified");
   expect(ctx["block.adoptHullBlock"]).toBeUndefined();
   const withAssess = buildCtx(v, { ...docRefs, assessUrl: "/assess/a.mjs", assessSha: "abc" });
