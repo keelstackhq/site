@@ -24,21 +24,21 @@ bosun prints exactly one JSON object on stdout: `{version, command, ok, exit_cod
 
 Do these first. Tell the owner the whole list at once (D-009); the owner may answer in one message ("approve A B C"). After each, run its check and go on only when it passes.
 
-| Step                                                 | Where          | Agent check                                                                                                    |
-| ---------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------- |
-| Create and push the GitHub repo                      | phone/computer | `gh repo view`                                                                                                 |
-| Install the Claude GitHub App on the repo            | phone/computer | `bosun doctor` (step 2)                                                                                        |
-| Approve the setup PR's head and merge it             | phone/computer | `gh pr view --json state`                                                                                      |
-| `hoist apply --area github` (needs admin rights)     | computer       | `hoist check`                                                                                                  |
-| Paste the cloud environment's setup script (Start E) | computer       | `bosun doctor` (step 6) checks only the repo file `docs/setup-script.sh`; the paste: TODO(copy), ask the owner |
-| `bosun keygen --enroll` for the signing session      | computer       | `git show origin/HEAD:.bosun/approvers.toml` lists the key id                                                  |
+| Step                                                 | Where          | Agent check                                                                                                                |
+| ---------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Create and push the GitHub repo                      | phone/computer | `gh repo view`                                                                                                             |
+| Install the Claude GitHub App on the repo            | phone/computer | `bosun doctor` (step 2) passes once the app has acted in the repo; before that ask the owner                               |
+| Approve the setup PR's head and merge it             | phone/computer | `gh pr view --json state`                                                                                                  |
+| `hoist apply --area github` (needs admin rights)     | computer       | `hoist check`                                                                                                              |
+| Paste the cloud environment's setup script (Start E) | computer       | `bosun doctor` (step 6) checks only the repo file `docs/setup-script.sh`; paste: TODO(copy), ask the owner                 |
+| `bosun keygen --enroll` for the signing session      | computer       | `git fetch origin && git show origin/<default-branch>:.bosun/approvers.toml` lists the key id once the enrolling PR merged |
 
 ```bash
 gh repo view <owner>/<repo> --json name,visibility   # the repo exists on GitHub
 gh pr view <n> --json state,headRefOid,mergedAt      # setup PR: state MERGED
-git show origin/HEAD:.bosun/approvers.toml           # the enrolled key's id is listed
+git fetch origin && git show origin/<default-branch>:.bosun/approvers.toml   # key id (<role>-<YYYY-MM>), once the enrolling PR merged
 hoist check --area github                             # after the owner's hoist apply: no drift
-bosun doctor                                          # step 2 Claude App, step 6 docs/setup-script.sh
+bosun doctor                                          # step 2 Claude App (once it has acted), step 6 docs/setup-script.sh
 bosun prereqs plans/<name>.md                         # every human step the plan needs
 ```
 
@@ -86,7 +86,7 @@ hoist plan --area github --adopt          # what would change; writes nothing
 hoist apply --area github --adopt --yes   # write it, then verify
 ```
 
-B. Adopt, channels only (no hull template; after the PR merges, then optionally bosun):
+B. Adopt, channels only (no hull template; then optionally bosun):
 
 ```bash
 pnpm dlx @keelstackhq/splice@0.5.1 channel add gh:keelstackhq/decisions//channel --track main --piece import-project

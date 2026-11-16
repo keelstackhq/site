@@ -207,9 +207,9 @@ export const cliBlock = "bosun doctor   # each missing step with its fix";
 export const humanChecksBlock: string = [
   "gh repo view <owner>/<repo> --json name,visibility   # the repo exists on GitHub",
   "gh pr view <n> --json state,headRefOid,mergedAt      # setup PR: state MERGED",
-  "git show origin/HEAD:.bosun/approvers.toml           # the enrolled key's id is listed",
+  "git fetch origin && git show origin/<default-branch>:.bosun/approvers.toml   # key id (<role>-<YYYY-MM>), once the enrolling PR merged",
   "hoist check --area github                             # after the owner's hoist apply: no drift",
-  "bosun doctor                                          # step 2 Claude App, step 6 docs/setup-script.sh",
+  "bosun doctor                                          # step 2 Claude App (once it has acted), step 6 docs/setup-script.sh",
   "bosun prereqs plans/<name>.md                         # every human step the plan needs",
 ].join("\n");
 

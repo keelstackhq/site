@@ -46,6 +46,10 @@ const ctx = buildCtx(undefined, {
 const fenced = (s: string): string[] =>
   [...s.matchAll(/```bash\n([\s\S]*?)\n```/g)].map((m) => m[1]!);
 
+/** Opening fences that are not exactly ```bash (fences alternate open, close). */
+const openers = (s: string): string[] =>
+  (s.match(/^```.*$/gm) ?? []).filter((l, i) => i % 2 === 0 && l !== "```bash");
+
 describe("agents/README.md", () => {
   test("every bash block equals a builder output", () => {
     const known = new Set(
@@ -60,11 +64,10 @@ describe("agents/README.md", () => {
     expect(ctx["block.rollbackBlock"]).toBeDefined();
   });
 
-  test("has no fenced block other than bash", () => {
-    expect([...doc.matchAll(/^```(\w*)/gm)].filter((m) => m[1] !== "bash" && m[1] !== "")).toEqual(
-      [],
-    );
-    expect((doc.match(/^```/gm) ?? []).length).toBe(2 * fenced(doc).length);
+  test("every opening fence is exactly ```bash", () => {
+    expect(openers(doc)).toEqual([]);
+    expect(openers("```bash\nx\n```\n```\ny\n```\n")).toEqual(["```"]);
+    expect(openers("```js\nx\n```\n")).toEqual(["```js"]);
   });
 
   test("agents/versions.json equals versions.ts", () => {
