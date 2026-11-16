@@ -25,6 +25,8 @@ test("derived keys", () => {
   expect(ctx["block.adoptHullBlock"]).toBeUndefined();
   const withAssess = buildCtx(v, { ...docRefs, assessUrl: "/assess/a.mjs", assessSha: "abc" });
   expect(withAssess["block.adoptHullBlock"]).toContain("/assess/a.mjs");
+  expect(withAssess["assess.url"]).toBe("/assess/a.mjs");
+  expect(withAssess["assess.sha"]).toBe("abc");
 });
 
 test("GitHub expressions pass through", () => {

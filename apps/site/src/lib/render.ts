@@ -35,6 +35,8 @@ export function buildCtx(
     approveBlock: sc.approveBlock,
   };
   if (refs.assessUrl && refs.assessSha) {
+    ctx["assess.url"] = refs.assessUrl;
+    ctx["assess.sha"] = refs.assessSha;
     blocks.adoptHullBlock = sc.adoptHullBlock(v, refs.assessUrl, refs.assessSha);
   }
   for (const [name, body] of Object.entries(blocks)) ctx[`block.${name}`] = fence(body);

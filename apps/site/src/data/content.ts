@@ -2,6 +2,7 @@
 import { buildCommand, DEFAULT_ON, SPLICE_VERSION } from "../lib/command";
 import { scenarios } from "./scenarios";
 import { org } from "./tools";
+import { tagCommits } from "./versions";
 
 export interface HeroVariant {
   lead: string;
@@ -149,8 +150,7 @@ export const update: {
       "Do bosun first, then hull: each is its own PR, each is R-gov, and the owner approves each head.",
       "Merge only when `ci-ok` is green.",
     ],
-    guide:
-      "https://github.com/keelstackhq/hull/blob/5a72442649f6958e91a50283a91e985f45e10a09/docs/updating.md",
+    guide: `https://github.com/keelstackhq/hull/blob/${tagCommits.hull}/docs/updating.md`,
   },
   bosun: {
     heading: "Update bosun",

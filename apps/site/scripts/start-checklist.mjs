@@ -5,6 +5,10 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 
+import { writeGenerated } from "./write-generated.ts";
+
+const { tagCommits, versions } = await import("../src/data/versions.ts");
+
 const ref = process.argv[2];
 if (!ref) throw new Error("usage: node scripts/start-checklist.mjs <hull tag or commit>");
 const repo = "keelstackhq/hull";
@@ -33,7 +37,12 @@ writeFileSync(
 );
 
 const isCommit = /^[0-9a-f]{40}$/.test(ref);
-const label = isCommit ? `commit \`${commit.slice(0, 7)}\`` : `\`${ref}\``;
+// The current hull release is a token ({{ks.*}}) so a bump re-renders it; any other ref stays literal.
+const isCurrent = ref === versions.hull && commit === tagCommits.hull;
+const label = isCommit
+  ? `commit \`${commit.slice(0, 7)}\``
+  : `\`${isCurrent ? "{{ks.hull}}" : ref}\``;
+const commitTok = isCurrent ? "{{ks.commit.hull}}" : commit;
 // "(not tagged yet)" only while hull has no v0.5.0 tag: ask the remote, never assume.
 const sinceTag = "v0.5.0";
 const tagged = execFileSync(
@@ -56,7 +65,7 @@ layout: ../../layouts/Docs.astro
 ---
 
 This page is hull's
-[\`docs/start-checklist.md\`](https://github.com/${repo}/blob/${commit}/${path}) at ${label},
+[\`docs/start-checklist.md\`](https://github.com/${repo}/blob/${commitTok}/${path}) at ${label},
 copied verbatim. A repo rendered from ${since} or later carries the same list: its \`ready\` skill
 (\`node scripts/ready.mjs\`) runs the checks and links each item to this file at the hull tag the
 repo was rendered from. The full path, with the details, is in
@@ -67,5 +76,6 @@ repo was rendered from. The full path, with the details, is in
 \`TODO(owner)\` in the copy is hull's own marker for facts hull's maintainers have not written down. It is not a step for you: skip it.
 
 ${copy.replace(/^# .*\n\n/, "")}${NOTE}`;
-writeFileSync(new URL("../src/pages/docs/start-project.md", import.meta.url), page);
+writeFileSync(new URL("../docs-src/start-project.md", import.meta.url), page);
+writeGenerated();
 console.log(`start-checklist: ${repo}@${commit} sha256 ${sha256}`);
