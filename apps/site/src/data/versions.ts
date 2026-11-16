@@ -19,6 +19,12 @@ export const tagCommits = {
   berth: "cab67fa16a1107df8219a26581c7300a19a71f76",
 } as const satisfies Record<keyof typeof versions, string>;
 
+/** Fixed refs the docs templates cite (`{{ks.ref.*}}`): bosun's spec at its 0.17.0 tag, the splice action pin. */
+export const docRefs = {
+  bosunSpec: tagCommits.bosun,
+  spliceAction: tagCommits.splice,
+} as const;
+
 /** The date the versions above were last checked against their tags and docs. */
 export const verifiedOn = "2026-11-16";
 
