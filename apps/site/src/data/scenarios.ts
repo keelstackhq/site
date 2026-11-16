@@ -167,7 +167,7 @@ export const HUMAN_STEPS: readonly HumanStep[] = [
   {
     when: "Before setup PR",
     what: "Signing key (optional): `bosun keygen --enroll`",
-    check: "`gh pr diff <n> --name-only`",
+    check: "`gh pr diff <n> --name-only`: approvers.toml",
   },
   {
     when: "Setup PR open",
@@ -191,7 +191,7 @@ export const HUMAN_STEPS_NOTE =
 
 /** Bosun alone has no hoist.toml: bosun adopt's own owner step for branch protection. */
 export const BOSUN_ALONE_HOIST =
-  "No hoist.toml (bosun alone): step 4 first lists `ci-ok`, `risk-check`, `review-verdict`, `main-open` in hoist.toml `[github] required_checks`, then `hoist apply --area github --adopt --yes`.";
+  "Bosun alone: step 4 first creates hoist.toml with `ci-ok`, `risk-check`, `review-verdict`, `main-open` in `[github] required_checks`, then `hoist apply --area github --adopt --yes`.";
 
 export const humanStepsTable = (steps: readonly HumanStep[] = HUMAN_STEPS): string =>
   [

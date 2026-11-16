@@ -33,12 +33,12 @@ bosun doctor                             # verify
 Run the git commands in data.commands (branch bosun-setup) and open the setup PR. Owner steps, in order, each with the check an agent runs (the owner merges the setup PR; agents never merge):
 
 1. Before setup PR: Install the Claude GitHub App on the repo. Agent check: `bosun doctor` step 2, once the app has acted.
-2. Before setup PR: Signing key (optional): `bosun keygen --enroll`. Agent check: `gh pr diff <n> --name-only`.
+2. Before setup PR: Signing key (optional): `bosun keygen --enroll`. Agent check: `gh pr diff <n> --name-only`: approvers.toml.
 3. Setup PR open: Approve the setup PR's head and merge it. Agent check: `gh pr view <n> --json state`.
 4. After that merge: `hoist apply --area github` (admin rights). Agent check: `hoist check --area github`.
 5. After that merge: Paste the setup script into the cloud environment. Agent check: `bosun doctor` step 6; else ask.
 
-No hoist.toml (bosun alone): step 4 first lists `ci-ok`, `risk-check`, `review-verdict`, `main-open` in hoist.toml `[github] required_checks`, then `hoist apply --area github --adopt --yes`.
+Bosun alone: step 4 first creates hoist.toml with `ci-ok`, `risk-check`, `review-verdict`, `main-open` in `[github] required_checks`, then `hoist apply --area github --adopt --yes`.
 
 ## Use Claude
 

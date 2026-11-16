@@ -29,7 +29,7 @@ For A and B, tell the owner the whole list at once (D-009); one message may answ
 | When             | Owner step                                        | Agent check                                   |
 | ---------------- | ------------------------------------------------- | --------------------------------------------- |
 | Before setup PR  | Install the Claude GitHub App on the repo         | `bosun doctor` step 2, once the app has acted |
-| Before setup PR  | Signing key (optional): `bosun keygen --enroll`   | `gh pr diff <n> --name-only`                  |
+| Before setup PR  | Signing key (optional): `bosun keygen --enroll`   | `gh pr diff <n> --name-only`: approvers.toml  |
 | Setup PR open    | Approve the setup PR's head and merge it          | `gh pr view <n> --json state`                 |
 | After that merge | `hoist apply --area github` (admin rights)        | `hoist check --area github`                   |
 | After that merge | Paste the setup script into the cloud environment | `bosun doctor` step 6; else ask               |
@@ -95,7 +95,7 @@ B. Adopt, channels only (no hull template). Bosun for rust or ts-pnpm: then `bos
 pnpm dlx @keelstackhq/splice@0.6.0 channel add gh:keelstackhq/decisions//channel --track main --piece import-project
 ```
 
-B. Adopt, with bosun alone (other stacks, or no splice). No hoist.toml (bosun alone): step 4 first lists `ci-ok`, `risk-check`, `review-verdict`, `main-open` in hoist.toml `[github] required_checks`, then `hoist apply --area github --adopt --yes`. Then write `plans/<name>.md` from the owner's brief:
+B. Adopt, with bosun alone (other stacks, or no splice). Bosun alone: step 4 first creates hoist.toml with `ci-ok`, `risk-check`, `review-verdict`, `main-open` in `[github] required_checks`, then `hoist apply --area github --adopt --yes`. Then write `plans/<name>.md` from the owner's brief:
 
 ```bash
 bosun adopt --dry-run                    # writes nothing
