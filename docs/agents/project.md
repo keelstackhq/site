@@ -32,6 +32,9 @@ freely, template updates never touch it.
     CSS + fonts for `/` under 150 KiB (153,600 B) transferred; the island JS is counted separately.
   - cascivo comes in through `@astrojs/react`, so `apps/site/astro.config.mjs` (template-owned)
     diverges from the template on purpose; keep that change when `splice update` ships.
+  - `apps/site/tsconfig.json` (`allowImportingTsExtensions`, for the Node-run docs generator) and
+    `apps/site/turbo.json` (`build`/`test` inputs add `$TURBO_ROOT$/agents/**` and `docs-src/**`)
+    diverge from the template on purpose; keep both when `splice update` ships.
   - Design spec: `docs/superpowers/specs/2026-10-16-landing-redesign-design.md` (supersedes
     `2026-10-16-landing-page-design.md`).
   - Update bot: `.github/workflows/splice.yml` (`keelstackhq/splice/action@8dcdf9a9faf35cd5b504c326c9107f8da689264e # v0.5.1`, `scope: all`,

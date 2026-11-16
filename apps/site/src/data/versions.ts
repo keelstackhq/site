@@ -29,8 +29,8 @@ export const docRefs = {
 export const verifiedOn = "2026-11-16";
 
 /** The one "last verified" line: shown once per page by components/Verified.astro and docs-md.ts. */
-export const verifiedLine = (): string =>
-  `Last verified ${verifiedOn} against bosun ${bare(versions.bosun)}, hull ${versions.hull}, splice ${versions.splice}.`;
+export const verifiedLine = (v: typeof versions = versions, on: string = verifiedOn): string =>
+  `Last verified ${on} against bosun ${bare(v.bosun)}, hull ${v.hull}, splice ${v.splice}.`;
 
 /** `v0.10.0` -> `0.10.0` */
 export const bare = (v: string): string => v.replace(/^v/, "");

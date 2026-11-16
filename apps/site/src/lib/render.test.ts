@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
 import { installBlock } from "../data/scenarios.ts";
-import { docRefs, versions } from "../data/versions.ts";
+import { docRefs, tagCommits, versions } from "../data/versions.ts";
 import { buildCtx, renderTemplate } from "./render.ts";
 
 const v = versions;
@@ -40,4 +40,22 @@ test("unknown token throws with file and line", () => {
 
 test("output has no tokens left", () => {
   expect(renderTemplate("{{ks.hull}} {{ks.bosun}}", ctx, "x.md")).not.toContain("{{ks.");
+});
+
+test("a token with inner spaces is not accepted", () => {
+  expect(() => renderTemplate("{{ks. splice }}", ctx, "x.md")).toThrow("unknown token");
+});
+
+test("commit, short and verified derive from the arguments", () => {
+  const c = buildCtx(
+    { ...v, bosun: "9.9.9" } as unknown as typeof versions,
+    docRefs,
+    { ...tagCommits, bosun: "abcdef1234" },
+    "2030-01-01",
+  );
+  expect(c["commit.bosun"]).toBe("abcdef1234");
+  expect(c["short.bosun"]).toBe("abcdef1");
+  expect(c.verified).toBe(
+    `Last verified 2030-01-01 against bosun 9.9.9, hull ${v.hull}, splice ${v.splice}.`,
+  );
 });
