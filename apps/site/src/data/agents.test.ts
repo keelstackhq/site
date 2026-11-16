@@ -9,7 +9,7 @@
 //     .bosun/approvers.toml; `bosun migrate --to <mode> [--dry-run|--direct]`, `--finish` after the
 //     merge. Source: `bosun doctor|keygen|migrate --help` at versions.bosun.
 //  4. `splice check` exits 1 on owned drift, leftover conflict markers OR an available update.
-//     Source: `splice check --help` at versions.splice (0.5.1; same text at 0.6.0).
+//     Source: `splice check --help` at versions.splice (0.6.0; same text at 0.5.1).
 //  5. `hoist check` is plan plus verification, read-only, exit 1 on drift; `hoist apply` writes then
 //     verifies. Source: `hoist --help`, `hoist check --help` at versions.hoist.
 //  6. `--assess --json` of hull's ready.mjs has schema `hull.assess/1` with fields template

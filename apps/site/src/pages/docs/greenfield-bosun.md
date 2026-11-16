@@ -136,8 +136,8 @@ one `UC-<ID>-<n>` line that a test can check. Human steps a plan needs go in a
 ## The order
 
 1. **Owner:** create the repo and install the [Claude GitHub App](https://github.com/apps/claude).
-2. **Agent:** render hull v0.12.0
-   (`pnpm dlx @keelstackhq/splice new gh:keelstackhq/hull//template <repo> --ref v0.12.0 --piece …`,
+2. **Agent:** render hull v0.12.1
+   (`pnpm dlx @keelstackhq/splice new gh:keelstackhq/hull//template <repo> --ref v0.12.1 --piece …`,
    or `//template-rust`; both ship `ready`),
    then run the `ready` skill (advisory since hull v0.11.0: it never blocks and takes defaults for unanswered onboarding questions; `.bosun/` does not exist yet, so answer `bosun` with `yes` in `docs/agents/onboarding.toml`).
 3. **Agent:** write the plan first: turn the brief into `plans/<name>.md` (the spec stays in

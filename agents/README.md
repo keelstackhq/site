@@ -6,7 +6,7 @@ You are an AI agent in the TARGET repo (the one to set up, adopt, upgrade or mov
 
 ## Use
 
-Current versions: hull v0.12.0, splice 0.5.1, bosun 0.17.0, hoist 0.5.1, hoard v0.6.1, berth 0.2.1. Machine-readable: https://keelstack.dev/agents/versions.json. Last verified 2026-11-16 against bosun 0.17.0, hull v0.12.0, splice 0.5.1.
+Current versions: hull v0.12.1, splice 0.6.0, bosun 0.17.0, hoist 0.5.1, hoard v0.6.1, berth 0.2.1. Machine-readable: https://keelstack.dev/agents/versions.json. Last verified 2026-11-16 against bosun 0.17.0, hull v0.12.1, splice 0.6.0.
 
 bosun prints exactly one JSON object on stdout: `{version, command, ok, exit_code, data, error, next}`; `error` is `{kind, message, fix}`. Do what `error.fix` says. Make the calls in `next`. Never work around a refusal. Exit codes: 0 ok, 1 error, 2 usage, 3 conflict, 4 halted, 5 needs-human, 6 limit. On exit 5 stop and tell the owner what is needed.
 
@@ -15,7 +15,7 @@ bosun prints exactly one JSON object on stdout: `{version, command, ok, exit_cod
 1. Empty repo or no commits: path A (new repo).
 2. Existing repo that only needs a mode change: path C.
 3. Existing repo with `.splice/` or `.bosun/version`: path D (upgrade).
-4. Other existing repo: run the assess block of path B. Read `template` in its JSON (schema `hull.assess/1`; the fields are in the table at https://raw.githubusercontent.com/keelstackhq/hull/v0.12.0/docs/adopt.md, not copied here). `stack` is null whenever `template` is null.
+4. Other existing repo: run the assess block of path B. Read `template` in its JSON (schema `hull.assess/1`; the fields are in the table at https://raw.githubusercontent.com/keelstackhq/hull/v0.12.1/docs/adopt.md, not copied here). `stack` is null whenever `template` is null.
    - `template` is `template` or `template-rust`: hull adopt (B), then bosun init with the printed `stack`.
    - `template` is null: channels only (B, channels block). Add bosun only if the owner wants it, with `--stack rust` or `--stack ts-pnpm` as the owner chooses; other stacks take the decisions channel only.
    - `confidence` low: ask the owner each `unsure` question. Never guess.
@@ -56,7 +56,7 @@ Needs git, Node and `gh auth login`. Work on a branch in a clean checkout. Each 
 A. New repo. Write `plans/<name>.md` from the owner's brief and `bosun plan check` it before `bosun init`. Use `//template-rust` and `--stack rust` for Rust.
 
 ```bash
-pnpm dlx @keelstackhq/splice@0.5.1 new gh:keelstackhq/hull//template my-repo --ref v0.12.0 --piece preact-app:web --piece hono-worker:api
+pnpm dlx @keelstackhq/splice@0.6.0 new gh:keelstackhq/hull//template my-repo --ref v0.12.1 --piece preact-app:web --piece hono-worker:api
 cd my-repo && pnpm install && pnpm run ci
 git add -A && git commit -m "chore: render from hull"   # splice new only runs git init
 gh repo create <owner>/my-repo --private --source . --push   # owner step, before bosun init
@@ -75,10 +75,10 @@ hoist apply --area github --yes   # write it, then verify like `hoist check`
 B. Adopt, with hull. Take `<template>` and each `<id>:<name>` from the assess JSON (`next`, `pieces`). Read the dry run's change list, then run the same splice command without `--dry-run`. Never pass `--force` unless the owner names the files it may replace. Open the PR; the owner merges it. Then bosun init (A) for `rust` or `ts-pnpm`, and hoist with `--adopt` (block below, run by the owner).
 
 ```bash
-curl -fsSL https://keelstack.dev/assess/v0.12.0.mjs -o /tmp/assess.mjs
+curl -fsSL https://keelstack.dev/assess/v0.12.1.mjs -o /tmp/assess.mjs
 echo "ff1bceb19e4a6688be7d8bd5c1e8a7cf1e2633fc35a3441b17938715d3aeb878  /tmp/assess.mjs" | sha256sum -c
 node /tmp/assess.mjs --assess --json
-npx @keelstackhq/splice@0.5.1 adopt gh:keelstackhq/hull//<template> --ref v0.12.0 --piece <id>:<name> ... --dry-run --json
+npx @keelstackhq/splice@0.6.0 adopt gh:keelstackhq/hull//<template> --ref v0.12.1 --piece <id>:<name> ... --dry-run --json
 ```
 
 ```bash
@@ -89,7 +89,7 @@ hoist apply --area github --adopt --yes   # write it, then verify
 B. Adopt, channels only (no hull template; then optionally bosun):
 
 ```bash
-pnpm dlx @keelstackhq/splice@0.5.1 channel add gh:keelstackhq/decisions//channel --track main --piece import-project
+pnpm dlx @keelstackhq/splice@0.6.0 channel add gh:keelstackhq/decisions//channel --track main --piece import-project
 ```
 
 B. Adopt, with bosun alone (no hull, no splice):
@@ -118,8 +118,8 @@ bosun pin --latest --pr               # verifies npm sha512, opens a draft PR; t
 npm i -g @keelstackhq/bosun@<new> && bosun --version
 # then hull, on its own branch:
 git switch <default-branch> && git pull && git switch -c chore/splice-update
-pnpm dlx @keelstackhq/splice@0.5.1 update --all
-pnpm dlx @keelstackhq/splice@0.5.1 check && pnpm install && pnpm run ci
+pnpm dlx @keelstackhq/splice@0.6.0 update --all
+pnpm dlx @keelstackhq/splice@0.6.0 check && pnpm install && pnpm run ci
 git add -A && git commit -m "chore: splice update to hull vX.Y.Z" && git push -u origin HEAD
 ```
 
@@ -138,7 +138,7 @@ Run each check when its step is done, not before. A red `pnpm run ci` is yours t
 ```bash
 pnpm run ci   # where the repo has it
 bosun doctor   # exit 5: owner steps pending; list them to the owner
-pnpm dlx @keelstackhq/splice@0.5.1 check --offline   # only with .splice/lock.toml; offline: an available update is not a failure
+pnpm dlx @keelstackhq/splice@0.6.0 check --offline   # only with .splice/lock.toml; offline: an available update is not a failure
 hoist check --area github   # only after the owner's hoist apply (add --adopt on an adopted repo)
 ```
 
@@ -156,4 +156,4 @@ bosun migrate --to <tighter-mode>                       # a mode too loose: one 
 
 - This file: https://raw.githubusercontent.com/keelstackhq/keelstack/main/agents/README.md (also https://keelstack.dev/agents.md)
 - One scenario each (Setup plus its block): https://keelstack.dev/docs/start/a.md to https://keelstack.dev/docs/start/f.md
-- hull adopt guide at the tag: https://raw.githubusercontent.com/keelstackhq/hull/v0.12.0/docs/adopt.md
+- hull adopt guide at the tag: https://raw.githubusercontent.com/keelstackhq/hull/v0.12.1/docs/adopt.md
