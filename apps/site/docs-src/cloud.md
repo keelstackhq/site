@@ -45,8 +45,8 @@ versions and their sha512 checksums and moves them only by reviewed pull request
 (R-gov).
 
 The script below is bosun's own,
-[`docs/setup-script.sh`](https://github.com/keelstackhq/bosun/blob/aa6c4c6fb8ec0282a13c9e1d1f1349aad0d4f1f1/docs/setup-script.sh)
-at bosun `main` commit `aa6c4c6` (the post-`v0.18.0` pin), copied verbatim. It installs bosun 0.18.0, splice 0.6.0, hoist 0.5.1 and berth 0.2.1; a repo's script pins the bosun release that repo uses.
+[`docs/setup-script.sh`](https://github.com/keelstackhq/bosun/blob/{{ks.script.commit}}/docs/setup-script.sh)
+at bosun `main` commit `{{ks.script.short}}` (the post-`v{{ks.script.bosun}}` pin), copied verbatim. It installs bosun {{ks.script.bosun}}, splice {{ks.script.splice}}, hoist {{ks.script.hoist}} and berth {{ks.script.berth}}; a repo's script pins the bosun release that repo uses.
 
 ```bash
 #!/usr/bin/env bash

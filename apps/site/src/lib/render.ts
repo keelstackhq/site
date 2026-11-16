@@ -1,5 +1,6 @@
 // Renders docs-src templates: `{{ks.NAME}}` tokens become values from the one version source.
-// Imports only versions.ts and scenarios.ts (with .ts extensions) so Node can run it directly.
+// Imports only versions.ts, scenarios.ts and setup-script.ts (with .ts extensions) so Node can run it directly.
+import { readSetupScript } from "./setup-script.ts";
 import * as sc from "../data/scenarios.ts";
 import { bare, docRefs, tagCommits, verifiedLine, verifiedOn, versions } from "../data/versions.ts";
 
@@ -25,6 +26,8 @@ export function buildCtx(
   ctx["ref.bosunSpec"] = refs.bosunSpec;
   ctx["ref.spliceAction"] = refs.spliceAction;
   ctx["ref.spliceActionVersion"] = refs.spliceActionVersion;
+  for (const [k, val] of Object.entries(readSetupScript())) ctx[`script.${k}`] = val;
+  ctx.verifiedOn = verified;
   ctx.verified = verifiedLine(v, verified);
   // One line per builder; add new ones here.
   const blocks: Record<string, string> = {

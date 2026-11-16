@@ -78,7 +78,7 @@ echo "ff1bceb19e4a6688be7d8bd5c1e8a7cf1e2633fc35a3441b17938715d3aeb878  /tmp/ass
 node /tmp/assess.mjs --assess --json
 ```
 
-The sha256 is that of hull v0.12.1's `template/pieces/base/files/scripts/ready.mjs` (a hull test
+The sha256 is that of hull {{ks.hull}}'s `template/pieces/base/files/scripts/ready.mjs` (a hull test
 keeps it equal); never use an unpinned latest URL. With a hull clone, run that file directly. It
 reads files (regular files up to 1 MB, never symlinks) and writes nothing.
 
