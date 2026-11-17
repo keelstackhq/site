@@ -1,6 +1,6 @@
 {
   "versions": {
-    "hull": "v0.12.1",
+    "hull": "v0.13.0",
     "splice": "0.6.0",
     "bosun": "0.18.0",
     "hoist": "0.5.1",

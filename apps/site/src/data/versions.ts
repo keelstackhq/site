@@ -1,7 +1,7 @@
 // The one table of current tool versions. A bump is one edit here, then `node scripts/adopt.mjs`,
 // the hero re-run (terminal in content.ts) and the Markdown pages that data/scenarios.test.ts names.
 export const versions = {
-  hull: "v0.12.1",
+  hull: "v0.13.0",
   splice: "0.6.0",
   bosun: "0.18.0",
   hoist: "0.5.1",
@@ -11,7 +11,7 @@ export const versions = {
 
 /** Commit each tag in `versions` points to (`git ls-remote`, peeled), checked 2026-11-16. */
 export const tagCommits = {
-  hull: "f59ed2bb7c30acdffc8fb14ba39273578bdb915a",
+  hull: "3f4a65fda568cdd20c76168ed156d25a28ba5630",
   splice: "feea8496215afce057f98eaea0e303aced93346c",
   bosun: "659e827efae2b242990cb82637a343638bbc6493",
   hoist: "5f21d0d0732651999d3e33912c1a287c385ecb9b",
