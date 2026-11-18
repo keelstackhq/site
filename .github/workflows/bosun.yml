@@ -59,7 +59,8 @@ jobs:
   # Read-only token, no secrets (both jobs).
   bosun-trusted:
     # Not for a draft: no runner starts (CI minutes); `ready_for_review` runs it.
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    # D-007: an `edited` event runs only for a retarget or a `snapshot-change:` line.
+    if: (github.event_name != 'pull_request' || github.event.pull_request.draft == false) && (github.event_name != 'pull_request' && github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base || contains(github.event.pull_request.body, 'snapshot-change:'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -349,7 +350,7 @@ jobs:
     needs: bosun-trusted
     # always(), not !cancelled(): a cancelled run would skip this job, and a skipped required
     # check counts as passed. The first step fails on a draft and unless bosun-trusted succeeded.
-    if: ${{ always() }}
+    if: ${{ always() && (github.event_name != 'pull_request' && github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base || contains(github.event.pull_request.body, 'snapshot-change:')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:

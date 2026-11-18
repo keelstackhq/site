@@ -55,7 +55,7 @@ jobs:
     # starts; `ready_for_review` judges it). A comment on a draft still judges, as before.
     if: >-
       github.event_name == 'push' ||
-      (github.event_name == 'pull_request_target' && github.event.pull_request.draft == false) ||
+      (github.event_name == 'pull_request_target' && github.event.pull_request.draft == false && (github.event_name != 'pull_request' && github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base || contains(github.event.pull_request.body, 'snapshot-change:'))) ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request && (contains(github.event.comment.body, '/bosun approve') ||
       (contains(github.event.comment.body, '/bosun recheck') &&
       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))))
