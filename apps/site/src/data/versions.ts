@@ -25,8 +25,8 @@ export const tagCommits = {
  */
 export const docRefs = {
   bosunSpec: tagCommits.bosun,
-  spliceAction: "8dcdf9a9faf35cd5b504c326c9107f8da689264e",
-  spliceActionVersion: "0.5.1",
+  spliceAction: "feea8496215afce057f98eaea0e303aced93346c",
+  spliceActionVersion: "0.6.0",
 } as const;
 
 /** Oldest bosun with `bosun migrate --to <mode>` and `--finish` (first shipped in 0.15.0, bosun CHANGELOG "## 0.15.0"). */
