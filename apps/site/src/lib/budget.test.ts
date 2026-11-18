@@ -22,7 +22,9 @@ const text = (b: Uint8Array) => new TextDecoder().decode(b);
 const gz = (b: Uint8Array) => gzipSync(b, { level: 9 }).length;
 
 it("keeps / (HTML + CSS gzipped + latin fonts) at or under 150 KiB", () => {
-  expect(existsSync(new URL("index.html", dist)), "the site build produced no index.html").toBe(true);
+  expect(existsSync(new URL("index.html", dist)), "the site build produced no index.html").toBe(
+    true,
+  );
   const html = read("/index.html");
   const css = [...text(html).matchAll(/<link[^>]+href="(\/[^"]+\.css)"/g)].map((m) => m[1]!);
   expect(css.length).toBeGreaterThan(0);
