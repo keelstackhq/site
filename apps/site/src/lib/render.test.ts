@@ -22,8 +22,12 @@ test("derived keys", () => {
   expect(ctx["ref.bosunSpec"]).toBe(docRefs.bosunSpec);
   expect(ctx["ref.spliceAction"]).toBe(docRefs.spliceAction);
   expect(ctx["ref.spliceActionVersion"]).toBe(docRefs.spliceActionVersion);
-  // The action pin is what bosun's channel seeds; it is a full commit SHA (it equals the splice tag's commit while bosun seeds the current splice release).
+  // The action pin is what bosun's channel seeds: a full commit SHA, and the splice tag's own
+  // commit while bosun seeds the current splice release.
   expect(ctx["ref.spliceAction"]).toMatch(/^[0-9a-f]{40}$/);
+  if (docRefs.spliceActionVersion === versions.splice) {
+    expect(ctx["ref.spliceAction"]).toBe(tagCommits.splice);
+  }
   expect(ctx.verified).toContain("Last verified");
   expect(ctx["block.adoptHullBlock"]).toBeUndefined();
   const withAssess = buildCtx(v, { ...docRefs, assessUrl: "/assess/a.mjs", assessSha: "abc" });
