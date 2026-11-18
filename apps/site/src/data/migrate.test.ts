@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vite-plus/test";
 import { footerLinks, nav } from "./content";
-import { APPENDIX_URL, migrate, MIN_BOSUN_MIGRATE, RUNBOOK_URL } from "./migrate";
+import { APPENDIX_URL, migrate, RUNBOOK_URL } from "./migrate";
+import { MIN_BOSUN_MIGRATE } from "./versions";
 import { buildLlmsTxt } from "../lib/llms";
 
 const page = readFileSync(new URL("../pages/migrate.astro", import.meta.url), "utf8");

@@ -1,11 +1,8 @@
 // Move a repo to bosun booster: copy from bosun docs/migrate-booster.md (bosun main at bd1f650),
-// Quick start at its top. Min bosun comes from MIN_BOSUN_MIGRATE; other versions come from versions.ts. Names no client org or repo.
+// Quick start at its top. Min bosun comes from MIN_BOSUN_MIGRATE (versions.ts); other versions come from versions.ts. Names no client org or repo.
 
 import { MIGRATE_NOTES, MIGRATE_PROMPT, MODE_LADDER } from "./scenarios";
-import { bare, versions } from "./versions";
-
-// Oldest bosun that supports `bosun migrate`. Bump only when the runbook needs a newer one.
-export const MIN_BOSUN_MIGRATE = "0.17.0";
+import { bare, MIN_BOSUN_MIGRATE, versions } from "./versions";
 
 export const RUNBOOK_URL = "https://github.com/keelstackhq/bosun/blob/main/docs/migrate-booster.md";
 export const APPENDIX_URL = `${RUNBOOK_URL}#appendix-a-the-manual-path`;
