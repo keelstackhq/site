@@ -59,8 +59,7 @@ jobs:
   # Read-only token, no secrets (both jobs).
   bosun-trusted:
     # Not for a draft: no runner starts (CI minutes); `ready_for_review` runs it.
-    # D-007: an `edited` event runs only for a retarget or a `snapshot-change:` line.
-    if: (github.event_name != 'pull_request' || github.event.pull_request.draft == false) && (github.event_name != 'pull_request' && github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base || contains(github.event.pull_request.body, 'snapshot-change:'))
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -212,7 +211,7 @@ jobs:
       # base's package.json `packageManager` names (the PR's while the base names none), an exact
       # version 9 or later from the registry, never a path, URL or range. No install, no cache. Skipped
       # while the stack has no lockfile yet (a new repo).
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         if: steps.plan.outputs.work == 'true' && steps.plan.outputs.setup == 'true' && hashFiles('./pnpm-lock.yaml') != ''
         with:
           node-version: 24
@@ -350,7 +349,7 @@ jobs:
     needs: bosun-trusted
     # always(), not !cancelled(): a cancelled run would skip this job, and a skipped required
     # check counts as passed. The first step fails on a draft and unless bosun-trusted succeeded.
-    if: ${{ always() && (github.event_name != 'pull_request' && github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base || contains(github.event.pull_request.body, 'snapshot-change:')) }}
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -421,7 +420,7 @@ jobs:
         if: needs.bosun-trusted.outputs.pr_gates != '' && hashFiles('./pnpm-lock.yaml') != ''
         with:
           package_json_file: ./package.json
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         if: needs.bosun-trusted.outputs.pr_gates != '' && hashFiles('./pnpm-lock.yaml') != ''
         with:
           node-version: 24

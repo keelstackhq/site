@@ -35,7 +35,7 @@ jobs:
     # change, which judges a draft too so an old verdict never outlives the label. Other label
     # events skip before a runner starts.
     if: >-
-      (github.event.pull_request.draft == false && (github.event_name != 'pull_request' && github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base || contains(github.event.pull_request.body, 'snapshot-change:')) &&
+      (github.event.pull_request.draft == false &&
       github.event.action != 'labeled' && github.event.action != 'unlabeled') ||
       github.event.label.name == 'bosun:kind/mainfix'
     runs-on: ubuntu-latest
